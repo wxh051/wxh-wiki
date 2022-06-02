@@ -1,14 +1,13 @@
 package com.wxh.wiki.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author wxh
  * @date 2022-06-02 12:54
- *
+ * <p>
  * //@Controller->返回页面（前后端分离，基本用不到这个注解）
  * //RestController(返回字符串)=controller+responseBody（返回字符串或JSON对象）
  */
@@ -22,5 +21,10 @@ public class TestController {
     @GetMapping("/hello")
     public String hello() {
         return "hello world!";
+    }
+
+    @PostMapping("/hello/post")
+    public String helloPost(String name) {
+        return "hello world! Post," + name;
     }
 }
