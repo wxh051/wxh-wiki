@@ -1,6 +1,7 @@
 package com.wxh.wiki.controller;
 
 import com.wxh.wiki.domain.Ebook;
+import com.wxh.wiki.resp.CommonResp;
 import com.wxh.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +19,18 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/ebook")
+@SuppressWarnings({"rawtypes"})
 public class EbookController {
 
     @Autowired
     private EbookService ebookService;
 
     @GetMapping("/list")
-    public List<Ebook>list(){
-        return ebookService.list();
+    public CommonResp list(){
+        CommonResp<List<Ebook>> resp = new CommonResp<>();
+        List<Ebook>list= ebookService.list();
+        resp.setContent(list);
+        return resp;
     }
 
 }
