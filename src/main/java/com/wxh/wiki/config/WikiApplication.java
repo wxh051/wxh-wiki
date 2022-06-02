@@ -1,6 +1,5 @@
 package com.wxh.wiki.config;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +9,7 @@ import org.springframework.core.env.Environment;
 
 /**
  * @author wxh
- *
+ * <p>
  * SpringBootApplication里面有@ComponentScan注解，用来扫描包，只会扫描这个类所在包下面的子包
  * 启动类放在config包里，需要手动设置一下ComponentScan注解。不要写com，会扫描到第三方jar，出错难以排查！！！
  * 支持扫描多个包（{，，}）
