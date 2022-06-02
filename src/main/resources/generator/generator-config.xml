@@ -7,6 +7,9 @@
 <generatorConfiguration>
     <context id="Mysql" targetRuntime="MyBatis3" defaultModelType="flat">
 
+        <!-- 此处为 true 时，生成的 Mapper 接口将增加 @Mapper 注解，Spring ComponentScan 时可自动识别 -->
+        <property name="addMapperAnnotation" value="true"/>
+
         <!-- 自动检查关键字，为关键字增加反引号 -->
         <property name="autoDelimitKeywords" value="true"/>
         <property name="beginningDelimiter" value="`"/>

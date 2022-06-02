@@ -1,7 +1,8 @@
 package com.wxh.wiki.controller;
 
-import com.wxh.wiki.domain.Ebook;
+import com.wxh.wiki.req.EbookReq;
 import com.wxh.wiki.resp.CommonResp;
+import com.wxh.wiki.resp.EbookResp;
 import com.wxh.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/ebook")
+//忽视泛型警告信息
 @SuppressWarnings({"rawtypes"})
 public class EbookController {
 
@@ -26,9 +28,9 @@ public class EbookController {
     private EbookService ebookService;
 
     @GetMapping("/list")
-    public CommonResp list(){
-        CommonResp<List<Ebook>> resp = new CommonResp<>();
-        List<Ebook>list= ebookService.list();
+    public CommonResp list(EbookReq req){
+        CommonResp<List<EbookResp>> resp = new CommonResp<>();
+        List<EbookResp>list= ebookService.list(req);
         resp.setContent(list);
         return resp;
     }
