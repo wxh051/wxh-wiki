@@ -1,5 +1,6 @@
 package com.wxh.wiki.config;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +16,7 @@ import org.springframework.core.env.Environment;
  * 支持扫描多个包（{，，}）
  */
 @ComponentScan("com.wxh")
+@MapperScan("com.wxh.wiki.mapper")
 @SpringBootApplication
 public class WikiApplication {
 
