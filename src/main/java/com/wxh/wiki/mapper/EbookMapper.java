@@ -2,9 +2,12 @@ package com.wxh.wiki.mapper;
 
 import com.wxh.wiki.domain.Ebook;
 import com.wxh.wiki.domain.EbookExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+@Repository
 public interface EbookMapper {
     long countByExample(EbookExample example);
 
