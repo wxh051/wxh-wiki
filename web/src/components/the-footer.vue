@@ -1,5 +1,5 @@
 <template>
-  <a-layout-footer style="text-align: center;height: 80px;width: 100%;bottom: 0">
+  <a-layout-footer style="text-align: center;height: 80px;width: 100%">
     xh电子书
   </a-layout-footer>
 </template>

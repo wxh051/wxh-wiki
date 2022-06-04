@@ -8,6 +8,7 @@ import com.wxh.wiki.resp.EbookResp;
 import com.wxh.wiki.util.CopyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -25,7 +26,10 @@ public class EbookService {
         EbookExample ebookExample = new EbookExample();
         //相当于where条件
         EbookExample.Criteria criteria = ebookExample.createCriteria();
-        criteria.andNameLike("%" + req.getName() + "%");
+        //动态SQL
+        if(!ObjectUtils.isEmpty(req.getName())){
+            criteria.andNameLike("%" + req.getName() + "%");
+        }
         //持久层返回List<Ebook>需要转换成List<EbookResp>再返回Controller
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
