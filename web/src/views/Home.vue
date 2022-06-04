@@ -10,7 +10,7 @@
         <a-sub-menu key="sub1">
           <template #title>
             <span>
-              <user-outlined />
+              <user-outlined/>
               subnav 1
             </span>
           </template>
@@ -22,7 +22,7 @@
         <a-sub-menu key="sub2">
           <template #title>
             <span>
-              <laptop-outlined />
+              <laptop-outlined/>
               subnav 2
             </span>
           </template>
@@ -34,7 +34,7 @@
         <a-sub-menu key="sub3">
           <template #title>
             <span>
-              <notification-outlined />
+              <notification-outlined/>
               subnav 3
             </span>
           </template>
@@ -54,9 +54,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {defineComponent} from 'vue';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'Home',
+//  Vue3新增的初始化方法。这个组件加载完后会去加载这个方法
+  setup() {
+    console.log("setup");
+    //跨域问题（后端不信任前端）解决
+    axios.get("http://localhost:8888/ebook/list?name=Spring").then((response) => {
+      console.log(response);
+    })
+  }
 });
 </script>
