@@ -105,7 +105,7 @@ export default defineComponent({
     // 如果写在setup方法里，有时候setup执行的时候界面还没渲染好，这时候如果去操作界面元素会报错
     onMounted(() => {
       console.log("onMounted");
-      axios.get("http://localhost:8888/ebook/list").then((response) => {
+      axios.get("/ebook/list").then((response) => {
         const data = response.data;
         ebooks.value = data.content
         ebooks1.books = data.content;
@@ -139,11 +139,11 @@ export default defineComponent({
 
 <!--scopeed代表这里的样式只在当前组件起作用-->
 <style scoped>
-  .ant-avatar{
-    width: 50px;
-    height: 50px;
-    line-height: 50px;
-    border-radius: 8%;
-    margin: 5px 0;
-  }
+.ant-avatar {
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  border-radius: 8%;
+  margin: 5px 0;
+}
 </style>
