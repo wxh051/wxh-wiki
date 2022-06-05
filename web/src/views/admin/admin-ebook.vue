@@ -87,6 +87,7 @@ export default defineComponent({
      * 数据查询
      **/
     const handleQuery = (params: any) => {
+      //loading是一个变量，在table组件里用到，true时，表格就会有个加载框，false时，加载框就消失
       loading.value = true;
       axios.get("/ebook/list", params).then((response) => {
         loading.value = false;
