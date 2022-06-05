@@ -45,6 +45,7 @@ export default defineComponent({
     });
     const loading = ref(false);
 
+    //dataIndex就是用来映射到你的后端返回的数据里的属性字段
     const columns = [
       {
         title: '封面',
