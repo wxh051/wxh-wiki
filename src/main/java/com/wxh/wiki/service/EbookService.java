@@ -7,6 +7,7 @@ import com.wxh.wiki.domain.EbookExample;
 import com.wxh.wiki.mapper.EbookMapper;
 import com.wxh.wiki.req.EbookReq;
 import com.wxh.wiki.resp.EbookResp;
+import com.wxh.wiki.resp.PageResp;
 import com.wxh.wiki.util.CopyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class EbookService {
     @Autowired
     private EbookMapper ebookMapper;
 
-    public List<EbookResp> list(EbookReq req) {
+    public PageResp<EbookResp> list(EbookReq req) {
         EbookExample ebookExample = new EbookExample();
         //相当于where条件
         EbookExample.Criteria criteria = ebookExample.createCriteria();
@@ -37,13 +38,14 @@ public class EbookService {
             criteria.andNameLike("%" + req.getName() + "%");
         }
         //从1开始。只对第一个遇到的select起作用
-        PageHelper.startPage(1,3);
+        PageHelper.startPage(req.getPage(),req.getSize());
         //持久层返回List<Ebook>需要转换成List<EbookResp>再返回Controller
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
         PageInfo<Ebook>pageInfo=new PageInfo<>(ebookList);
         //一般前端分页组件只需要total，就会自己计算出pages
         LOG.info("总行数：{}",pageInfo.getTotal());
+        LOG.info("总页数：{}",pageInfo.getPages());
 
 
         // List<EbookResp>respList = new ArrayList<>();
@@ -58,6 +60,9 @@ public class EbookService {
         //列表复制
         List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
 
-        return list;
+        PageResp<EbookResp>pageResp=new PageResp<>();
+        pageResp.setTotal(pageInfo.getTotal());
+        pageResp.setList(list);
+        return pageResp;
     }
 }
