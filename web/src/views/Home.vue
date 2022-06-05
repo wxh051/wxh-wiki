@@ -94,22 +94,18 @@ export default defineComponent({
   //Vue3新增的初始化方法。这个组件加载完后会去加载这个方法
   //setup就放一些参数定义，方法定义
   setup() {
-    console.log("setup");
     //ref():响应式数据，在js里动态修改里面的值，实时反馈到页面上
     const ebooks = ref();
     //定义一个变量，实际上返回的是里面的属性，将这个属性变成一个响应式变量
     const ebooks1 = reactive({books: []});
 
-
     //一般要初始化的一些逻辑，建议都写到生命周期函数里。
     // 如果写在setup方法里，有时候setup执行的时候界面还没渲染好，这时候如果去操作界面元素会报错
     onMounted(() => {
-      console.log("onMounted");
       axios.get("/ebook/list").then((response) => {
         const data = response.data;
         ebooks.value = data.content
         ebooks1.books = data.content;
-        console.log(response);
       });
     })
 
