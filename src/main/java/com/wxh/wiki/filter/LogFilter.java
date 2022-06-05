@@ -1,3 +1,4 @@
+/*
 package com.wxh.wiki.filter;
 
 import org.slf4j.Logger;
@@ -8,11 +9,14 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+*/
 /**
  * @author wxh
  * @date 2022-06-05 12:52
  * 过滤器交给容器使用
- */
+ * @WebFilter也可以，它可以多配置一些属性，比如过滤器名称等
+ *//*
+
 @Component
 public class LogFilter implements Filter {
 
@@ -35,4 +39,4 @@ public class LogFilter implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
         LOG.info("------------- LogFilter 结束 耗时：{} ms -------------", System.currentTimeMillis() - startTime);
     }
-}
+}*/
