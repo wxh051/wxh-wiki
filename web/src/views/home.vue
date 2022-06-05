@@ -76,7 +76,7 @@
 import {defineComponent, onMounted, ref, reactive, toRef} from 'vue';
 import axios from 'axios';
 
-const listData: any = [];
+/*const listData: any = [];
 for (let i = 0; i < 23; i++) {
   listData.push({
     href: 'https://www.antdv.com/',
@@ -87,7 +87,7 @@ for (let i = 0; i < 23; i++) {
     content:
         'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
   });
-}
+}*/
 
 export default defineComponent({
   name: 'Home',
@@ -102,10 +102,15 @@ export default defineComponent({
     //一般要初始化的一些逻辑，建议都写到生命周期函数里。
     // 如果写在setup方法里，有时候setup执行的时候界面还没渲染好，这时候如果去操作界面元素会报错
     onMounted(() => {
-      axios.get("/ebook/list").then((response) => {
+      axios.get("/ebook/list", {
+        params: {
+          page: 1,
+          size: 1000
+        }
+      }).then((response) => {
         const data = response.data;
-        ebooks.value = data.content
-        ebooks1.books = data.content;
+        ebooks.value = data.content.list
+        // ebooks1.books = data.content;
       });
     })
 
@@ -114,9 +119,8 @@ export default defineComponent({
       ebooks,
       //返回，只需要返回books这段就可以；通过toref变成响应式变量
       //另有一个torefs，可以将所有属性变成响应式变量
-      ebooks2: toRef(ebooks1, "books"),
-
-      listData,
+      // ebooks2: toRef(ebooks1, "books"),
+      // listData,
       pagination: {
         onChange: (page: any) => {
           console.log(page);

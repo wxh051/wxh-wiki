@@ -3,7 +3,7 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-<!--  pagination:分页 loading：等待框，true的话有个等待的效果    -->
+      <!--  pagination:分页 loading：等待框，true的话有个等待的效果    -->
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -13,7 +13,7 @@
           @change="handleTableChange"
       >
         <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar" />
+          <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 
 export default defineComponent({
@@ -40,7 +40,7 @@ export default defineComponent({
     const ebooks = ref();
     const pagination = ref({
       current: 1,
-      pageSize: 2,
+      pageSize: 4,
       total: 0
     });
     const loading = ref(false);
@@ -50,7 +50,7 @@ export default defineComponent({
       {
         title: '封面',
         dataIndex: 'cover',
-        slots: { customRender: 'cover' }
+        slots: {customRender: 'cover'}
       },
       {
         title: '名称',
@@ -80,7 +80,7 @@ export default defineComponent({
       {
         title: 'Action',
         key: 'action',
-        slots: { customRender: 'action' }
+        slots: {customRender: 'action'}
       }
     ];
 
@@ -90,13 +90,19 @@ export default defineComponent({
     const handleQuery = (params: any) => {
       //loading是一个变量，在table组件里用到，true时，表格就会有个加载框，false时，加载框就消失
       loading.value = true;
-      axios.get("/ebook/list", params).then((response) => {
+      axios.get("/ebook/list", {
+        params: {
+          page: params.page,
+          size: params.size
+        }
+      }).then((response) => {
         loading.value = false;
         const data = response.data;
-        ebooks.value = data.content;
+        ebooks.value = data.content.list;
 
         // 重置分页按钮
         pagination.value.current = params.page;
+        pagination.value.total = data.content.total;
       });
     };
 
@@ -112,7 +118,11 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      handleQuery({});
+      handleQuery({
+        //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
+        page: 1,
+        size: pagination.value.pageSize
+      });
     });
 
     return {
