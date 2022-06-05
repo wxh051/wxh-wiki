@@ -1,11 +1,15 @@
 package com.wxh.wiki.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.wxh.wiki.domain.Ebook;
 import com.wxh.wiki.domain.EbookExample;
 import com.wxh.wiki.mapper.EbookMapper;
 import com.wxh.wiki.req.EbookReq;
 import com.wxh.wiki.resp.EbookResp;
 import com.wxh.wiki.util.CopyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -18,6 +22,8 @@ import java.util.List;
  */
 @Service
 public class EbookService {
+    private static final Logger LOG = LoggerFactory.getLogger(EbookService.class);
+
 
     @Autowired
     private EbookMapper ebookMapper;
@@ -30,8 +36,15 @@ public class EbookService {
         if(!ObjectUtils.isEmpty(req.getName())){
             criteria.andNameLike("%" + req.getName() + "%");
         }
+        //从1开始。只对第一个遇到的select起作用
+        PageHelper.startPage(1,3);
         //持久层返回List<Ebook>需要转换成List<EbookResp>再返回Controller
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
+
+        PageInfo<Ebook>pageInfo=new PageInfo<>(ebookList);
+        //一般前端分页组件只需要total，就会自己计算出pages
+        LOG.info("总行数：{}",pageInfo.getTotal());
+
 
         // List<EbookResp>respList = new ArrayList<>();
         // for (Ebook ebook : ebookList) {
