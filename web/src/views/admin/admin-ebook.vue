@@ -27,9 +27,16 @@
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
-            <a-button type="danger">
-              删除
-            </a-button>
+            <a-popconfirm
+                title="Are you sure delete this task?"
+                ok-text="是"
+                cancel-text="否"
+                @confirm="handleDelete(record.id)"
+            >
+              <a-button type="danger">
+                删除
+              </a-button>
+            </a-popconfirm>
           </a-space>
         </template>
       </a-table>
@@ -57,7 +64,7 @@
         <a-input v-model:value="ebook.category2Id"/>
       </a-form-item>
       <a-form-item label="描述">
-        <a-input v-model:value="ebook.desc" type="textarea"/>
+        <a-input v-model:value="ebook.description" type="textarea"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -193,6 +200,24 @@ export default defineComponent({
       ebook.value = {};
     };
 
+    /**
+     * 删除
+     * 这个参数类型本来写的是number，改成any（6-9评论里老师建议-因为精度丢失问题）
+     */
+    const handleDelete = (id: any) => {
+      axios.delete("/ebook/delete/" + id).then((response) => {
+        const data = response.data;//data=commonResponse
+        if (data.success) {
+          //重新加载列表，查询当前页
+          handleQuery({
+            //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
+            page: pagination.value.current,
+            size: pagination.value.pageSize
+          });
+        }
+      });
+    };
+
     onMounted(() => {
       handleQuery({
         //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
@@ -210,6 +235,7 @@ export default defineComponent({
 
       edit,
       add,
+      handleDelete,
 
       ebook,
       modalVisible,

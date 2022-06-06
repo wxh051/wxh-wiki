@@ -41,4 +41,12 @@ public class EbookController {
         ebookService.save(req);
         return resp;
     }
+
+    //使用restful风格
+    @DeleteMapping("/delete/{id}")
+    public CommonResp delete(@PathVariable Long id){
+        CommonResp resp = new CommonResp<>();
+        ebookService.delete(id);
+        return resp;
+    }
 }
