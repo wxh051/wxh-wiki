@@ -1,14 +1,13 @@
 package com.wxh.wiki.controller;
 
-import com.wxh.wiki.req.EbookReq;
+import com.wxh.wiki.req.EbookQueryReq;
+import com.wxh.wiki.req.EbookSaveReq;
 import com.wxh.wiki.resp.CommonResp;
-import com.wxh.wiki.resp.EbookResp;
+import com.wxh.wiki.resp.EbookQueryResp;
 import com.wxh.wiki.resp.PageResp;
 import com.wxh.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author wxh
@@ -27,11 +26,19 @@ public class EbookController {
     private EbookService ebookService;
 
     @GetMapping("/list")
-    public CommonResp list(EbookReq req){
-        CommonResp<PageResp<EbookResp>> resp = new CommonResp<>();
-        PageResp<EbookResp> list= ebookService.list(req);
+    public CommonResp list(EbookQueryReq req){
+        CommonResp<PageResp<EbookQueryResp>> resp = new CommonResp<>();
+        PageResp<EbookQueryResp> list= ebookService.list(req);
         resp.setContent(list);
         return resp;
     }
 
+    @PostMapping("/save")
+    //@RequestBody这个注解对应的就是JSON方式的post提交，Content-Type: application/json，通过RequestBody才能接收到
+    //如果通过form方式提交（x-www-form-urlencoded）则不用加这个注解
+    public CommonResp save(@RequestBody EbookSaveReq req){
+        CommonResp resp = new CommonResp<>();
+        ebookService.save(req);
+        return resp;
+    }
 }

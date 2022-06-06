@@ -1,6 +1,9 @@
-package com.wxh.wiki.resp;
+package com.wxh.wiki.req;
 
-public class EbookResp {
+/**
+ * @author wxh
+ */
+public class EbookSaveReq {
     private Long id;
 
     private String name;

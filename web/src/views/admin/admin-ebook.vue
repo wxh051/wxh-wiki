@@ -15,7 +15,8 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
-<!--        record对应着一整行的数据-->
+        <!--        template可以用来渲染某个字段-->
+        <!--        默认提供text和record，text表示当前要渲染的字段的值，record表示这一行记录，可以通过record.id来获得这一行的id-->
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">
@@ -39,19 +40,19 @@
   >
     <a-form :model="ebook" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="封面">
-        <a-input v-model:value="ebook.cover" />
+        <a-input v-model:value="ebook.cover"/>
       </a-form-item>
       <a-form-item label="名称">
-        <a-input v-model:value="ebook.name" />
+        <a-input v-model:value="ebook.name"/>
       </a-form-item>
       <a-form-item label="分类一">
-        <a-input v-model:value="ebook.category1Id" />
+        <a-input v-model:value="ebook.category1Id"/>
       </a-form-item>
       <a-form-item label="分类二">
-        <a-input v-model:value="ebook.category2Id" />
+        <a-input v-model:value="ebook.category2Id"/>
       </a-form-item>
       <a-form-item label="描述">
-        <a-input v-model:value="ebook.desc" type="textarea" />
+        <a-input v-model:value="ebook.desc" type="textarea"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -118,6 +119,7 @@ export default defineComponent({
       //loading是一个变量，在table组件里用到，true时，表格就会有个加载框，false时，加载框就消失
       loading.value = true;
       axios.get("/ebook/list", {
+        //还可以通过拼接URL的方式添加参数
         params: {
           page: params.page,
           size: params.size
@@ -146,23 +148,35 @@ export default defineComponent({
     };
 
     // -------- 表单 ---------
+    //前面三行是定义响应式变量，handleModalOk是点击确定按钮是触发这个方法
     const ebook = ref({});
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
-      setTimeout(() => {
-        modalVisible.value = false;
-        modalLoading.value = false;
-      }, 2000);
+      //PSOT请求不需要params参数
+      axios.post("/ebook/save", ebook.value).then((response) => {
+        const data = response.data;//data=commonResponse
+        if (data.success) {
+          modalVisible.value = false;
+          modalLoading.value = false;
+
+          //重新加载列表，查询当前页
+          handleQuery({
+            //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
+            page: pagination.value.current,
+            size: pagination.value.pageSize
+          });
+        }
+      });
     };
 
     /**
      * 编辑
      */
-    const edit = (record:any) => {
+    const edit = (record: any) => {
       modalVisible.value = true;
-      ebook.value=record
+      ebook.value = record
     };
 
     onMounted(() => {

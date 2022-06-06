@@ -1,3 +1,11 @@
 GET http://localhost:8888/ebook/list
 
 ###
+
+#用application/json，controller介绍参数加上RequestBody注解
+POST http://localhost:8888/ebook/save
+Content-Type: application/json
+
+{}
+
+###
