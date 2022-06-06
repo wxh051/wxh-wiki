@@ -34,7 +34,7 @@ public class EbookController {
     }
 
     @PostMapping("/save")
-    //@RequestBody这个注解对应的就是JSON方式的post提交，Content-Type: application/json，通过RequestBody才能接收到
+    //@RequestBody这个注解对应的就是JSON方式的post提交，Content-Type: application/json，前端放在body里，后端通过RequestBody才能接收到
     //如果通过form方式提交（x-www-form-urlencoded）则不用加这个注解
     public CommonResp save(@RequestBody EbookSaveReq req){
         CommonResp resp = new CommonResp<>();

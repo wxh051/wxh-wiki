@@ -1,5 +1,8 @@
 package com.wxh.wiki.resp;
 
+/**
+ * @author wxh
+ */
 public class EbookQueryResp {
     private Long id;
 

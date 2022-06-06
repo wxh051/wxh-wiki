@@ -4,6 +4,11 @@
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
       <!--  pagination:分页 loading：等待框，true的话有个等待的效果    -->
+      <p>
+        <a-button type="primary" @click="add()" size="large">
+          新增
+        </a-button>
+      </p>
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -153,6 +158,7 @@ export default defineComponent({
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleModalOk = () => {
+      //显示loading效果
       modalLoading.value = true;
       //PSOT请求不需要params参数
       axios.post("/ebook/save", ebook.value).then((response) => {
@@ -179,6 +185,14 @@ export default defineComponent({
       ebook.value = record
     };
 
+    /**
+     * 新增
+     */
+    const add = () => {
+      modalVisible.value = true;
+      ebook.value = {};
+    };
+
     onMounted(() => {
       handleQuery({
         //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
@@ -195,6 +209,7 @@ export default defineComponent({
       handleTableChange,
 
       edit,
+      add,
 
       ebook,
       modalVisible,
