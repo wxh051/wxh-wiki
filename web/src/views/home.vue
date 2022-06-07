@@ -7,10 +7,8 @@
           @click="handleClick"
       >
         <a-menu-item key="welcome">
-          <router-link :to="'/'">
-            <MailOutlined/>
-            <span>欢迎</span>
-          </router-link>
+          <MailOutlined/>
+          <span>欢迎</span>
         </a-menu-item>
         <a-sub-menu v-for="item in level1" :key="item.id">
           <!--   一级菜单       -->
@@ -21,7 +19,8 @@
           </template>
           <!--   二级菜单       -->
           <a-menu-item v-for="child in item.children" :key="child.id">
-            <MailOutlined/><span>{{ child.name }}</span>
+            <MailOutlined/>
+            <span>{{ child.name }}</span>
           </a-menu-item>
         </a-sub-menu>
       </a-menu>
@@ -29,7 +28,11 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list item-layout="vertical" size="large" :grid="{ gutter: 20, column: 3 }" :data-source="ebooks">
+      <div class="welcome" v-show="isShowWelcome">
+        <h1>欢迎使用xh知识库</h1>
+      </div>
+      <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :grid="{ gutter: 20, column: 3 }"
+              :data-source="ebooks">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
@@ -103,25 +106,41 @@ export default defineComponent({
       });
     };
 
-    const handleClick = () => {
-      console.log("menu click")
-    };
+    const isShowWelcome = ref(true);
+    let categoryId2 = 0;
 
-    //一般要初始化的一些逻辑，建议都写到生命周期函数里。
-    // 如果写在setup方法里，有时候setup执行的时候界面还没渲染好，这时候如果去操作界面元素会报错
-    onMounted(() => {
-      handleQueryCategory();
+    const handleQueryEbook = () => {
       axios.get("/ebook/list", {
         params: {
           page: 1,
-          size: 1000
+          size: 1000,
+          categoryId2: categoryId2
         }
       }).then((response) => {
         const data = response.data;
         ebooks.value = data.content.list
         // ebooks1.books = data.content;
       });
-    })
+    };
+
+    const handleClick = (value: any) => {
+      // console.log("menu click", value)
+      //key就是传进来的参数
+      if (value.key === 'welcome') {
+        isShowWelcome.value = true;
+      } else {
+        categoryId2 = value.key;
+        isShowWelcome.value = false;
+        //点击分类时，调用一下查询方法
+        handleQueryEbook();
+      }
+    };
+
+    //一般要初始化的一些逻辑，建议都写到生命周期函数里。
+    // 如果写在setup方法里，有时候setup执行的时候界面还没渲染好，这时候如果去操作界面元素会报错
+    onMounted(() => {
+      handleQueryCategory();
+    });
 
     //HTML代码拿到响应式变量，需要在setup最后return
     return {
@@ -144,6 +163,7 @@ export default defineComponent({
 
       handleClick,
       level1,
+      isShowWelcome,
     }
   }
 });

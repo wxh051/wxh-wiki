@@ -42,6 +42,11 @@ public class EbookService {
         if(!ObjectUtils.isEmpty(req.getName())){
             criteria.andNameLike("%" + req.getName() + "%");
         }
+
+        if(!ObjectUtils.isEmpty(req.getCategoryId2())){
+            criteria.andCategory2IdEqualTo(req.getCategoryId2());
+        }
+
         //从1开始。只对第一个遇到的select起作用
         PageHelper.startPage(req.getPage(),req.getSize());
         //持久层返回List<Ebook>需要转换成List<EbookResp>再返回Controller
