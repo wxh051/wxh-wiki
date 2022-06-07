@@ -37,6 +37,11 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
+        <!--  现在的分类不是一个普通字段，是一种组合，是自定义的显示方式。需要定义一个渲染      -->
+        <!--  不带具体字段的值的渲染，text和record是一样的      -->
+        <template v-slot:category="{ text, record }">
+          <span>{{ getCategoryName(record.category1Id) }} / {{ getCategoryName(record.category2Id) }}</span>
+        </template>
         <!--    template可以用来渲染某个字段  -->
         <!--    默认提供text和record，text表示当前要渲染的字段的值，record表示这一行记录，可以通过record.id来获得这一行的id -->
         <template v-slot:action="{ text, record }">
@@ -124,13 +129,8 @@ export default defineComponent({
         dataIndex: 'name'
       },
       {
-        title: '分类一',
-        key: 'category1Id',
-        dataIndex: 'category1Id'
-      },
-      {
-        title: '分类二',
-        dataIndex: 'category2Id'
+        title: '分类',
+        slots: {customRender: 'category'}
       },
       {
         title: '文档数',
@@ -266,6 +266,8 @@ export default defineComponent({
     };
 
     const level1 = ref();
+    //定义一个全局普通变量（只在JS里用），不是响应式变量
+    let categorys: any
     /**
      * 查询所有分类
      **/
@@ -275,16 +277,34 @@ export default defineComponent({
         loading.value = false;
         const data = response.data;
         if (data.success) {
-          const categorys = data.content;
+          categorys = data.content;
           console.log("原始数组：", categorys);
 
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
           console.log("树形结构：", level1.value);
+
+          //  加载完分类后，再加载电子书，否则如果分类树加载很慢，则电子书渲染会报错
+          handleQuery({
+            page: 1,
+            size: pagination.value.pageSize,
+          });
         } else {
           message.error(data.message);
         }
       });
+    };
+
+    const getCategoryName = (cid: number) => {
+      // console.log(cid)
+      let result = "";
+      categorys.forEach((item: any) => {
+        if (item.id === cid) {
+          // return item.name; // 注意，这里直接return不起作用
+          result = item.name;
+        }
+      });
+      return result;
     };
 
     onMounted(() => {
@@ -305,6 +325,7 @@ export default defineComponent({
       handleTableChange,
       //handleQuery因为在按名字查询时HTML用到了，所以需要return出去
       handleQuery,
+      getCategoryName,
 
       edit,
       add,
