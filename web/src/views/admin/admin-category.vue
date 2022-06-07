@@ -20,7 +20,7 @@
       <a-table
           :columns="columns"
           :row-key="record => record.id"
-          :data-source="categorys"
+          :data-source="level1"
           :loading="loading"
           :pagination="false"
       >
@@ -107,6 +107,19 @@ export default defineComponent({
     ];
 
     /**
+     * 一级分类树，children属性就是二级分类
+     * [{
+     *   id: "",
+     *   name: "",
+     *   children: [{
+     *     id: "",
+     *     name: "",
+     *   }]
+     * }]
+     */
+    const level1 = ref(); // 一级分类树，children属性就是二级分类
+
+    /**
      * 数据查询
      **/
     const handleQuery = () => {
@@ -115,7 +128,14 @@ export default defineComponent({
         loading.value = false;
         const data = response.data;
         if (data.success) {
+          //这里没有适用分页封装到page里，前端日志可以看到返回结果就存在content，不需要.list
           categorys.value = data.content;
+          //一级分类对应的parent为0，初始传入0
+          console.log("原始数组：", categorys.value);
+
+          level1.value = [];
+          level1.value = Tool.array2Tree(categorys.value, 0);
+          console.log("树形结构：", level1);
         } else {
           message.error(data.message);
         }
@@ -180,7 +200,8 @@ export default defineComponent({
 
     return {
       param,
-      categorys,
+      // categorys,
+      level1,
       columns,
       loading,
       handleQuery,
