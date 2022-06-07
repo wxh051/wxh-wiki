@@ -89,6 +89,7 @@
 import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
+import {Tool} from "@/util/tool";
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -217,7 +218,8 @@ export default defineComponent({
      */
     const edit = (record: any) => {
       modalVisible.value = true;
-      ebook.value = record
+      //在编辑时修改ebook，通过复制一个对象，对原来的值就没有影响了
+      ebook.value = Tool.copy(record);
     };
 
     /**
