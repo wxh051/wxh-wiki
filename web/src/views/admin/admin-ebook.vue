@@ -37,8 +37,9 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
+        <!--  不带具体字段的值的渲染，text和record是一样的。      -->
+        <!--  如果渲染绑定了dataIndex，就相当于对数据某一列元素操作，这时候text等于record.dataIndex      -->
         <!--  现在的分类不是一个普通字段，是一种组合，是自定义的显示方式。需要定义一个渲染      -->
-        <!--  不带具体字段的值的渲染，text和record是一样的      -->
         <template v-slot:category="{ text, record }">
           <span>{{ getCategoryName(record.category1Id) }} / {{ getCategoryName(record.category2Id) }}</span>
         </template>
@@ -157,6 +158,11 @@ export default defineComponent({
     const handleQuery = (params: any) => {
       //loading是一个变量，在table组件里用到，true时，表格就会有个加载框，false时，加载框就消失
       loading.value = true;
+
+      //如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，列表显示的还是编辑前的数据
+      //但是我这里并没有这个问题，不清空也可以显示修改了的数据
+      ebooks.value = [];
+
       axios.get("/ebook/list", {
         //还可以通过拼接URL的方式添加参数
         params: {
@@ -245,6 +251,8 @@ export default defineComponent({
     const add = () => {
       modalVisible.value = true;
       ebook.value = {};
+      //这里清空一下级联框的值，不然如果点击了编辑按钮，然后关闭编辑框，再次点击新增按钮，会保留上次编辑的分类数据
+      categoryIds.value = [];
     };
 
     /**
@@ -308,6 +316,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
+      //加载分类
       handleQueryCategory();
       handleQuery({
         //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
