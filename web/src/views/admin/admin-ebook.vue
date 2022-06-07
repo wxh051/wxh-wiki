@@ -8,7 +8,9 @@
         <a-form layout="inline" :model="param">
           <a-form-item>
             <a-input v-model:value="param.name" placeholder="名称">
-              <template #prefix><SmileTwoTone  style="color: rgba(0, 0, 0, 0.25)" /></template>
+              <template #prefix>
+                <SmileTwoTone style="color: rgba(0, 0, 0, 0.25)"/>
+              </template>
             </a-input>
           </a-form-item>
           <a-form-item>
@@ -35,8 +37,8 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
-        <!--        template可以用来渲染某个字段-->
-        <!--        默认提供text和record，text表示当前要渲染的字段的值，record表示这一行记录，可以通过record.id来获得这一行的id-->
+        <!--    template可以用来渲染某个字段  -->
+        <!--    默认提供text和record，text表示当前要渲染的字段的值，record表示这一行记录，可以通过record.id来获得这一行的id -->
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">
@@ -72,11 +74,15 @@
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name"/>
       </a-form-item>
-      <a-form-item label="分类一">
-        <a-input v-model:value="ebook.category1Id"/>
-      </a-form-item>
-      <a-form-item label="分类二">
-        <a-input v-model:value="ebook.category2Id"/>
+      <a-form-item label="分类">
+        <!-- value对应的就是选中的值，是个数组       -->
+        <!--   lable：显示name属性 value：实际要取得值  children：子属性   -->
+        <!--    id,name,children就是level1的属性    -->
+        <a-cascader
+            v-model:value="categoryIds"
+            :field-names="{ label: 'name', value: 'id', children: 'children' }"
+            :options="level1"
+        />
       </a-form-item>
       <a-form-item label="描述">
         <a-input v-model:value="ebook.description" type="textarea"/>
@@ -186,13 +192,21 @@ export default defineComponent({
     };
 
     // -------- 表单 ---------
-    //前面三行是定义响应式变量，handleModalOk是点击确定按钮是触发这个方法
-    const ebook = ref({});
+    /**
+     * 数组【100,101】对应：前端开发/Vue
+     */
+    const categoryIds = ref();
+
+    const ebook = ref();
     const modalVisible = ref(false);
     const modalLoading = ref(false);
+    //handleModalOk是点击确定按钮是触发这个方法
     const handleModalOk = () => {
       //显示loading效果
       modalLoading.value = true;
+      //拆开获得两个分类值
+      ebook.value.category1Id = categoryIds.value[0];
+      ebook.value.category2Id = categoryIds.value[1];
       //PSOT请求不需要params参数
       axios.post("/ebook/save", ebook.value).then((response) => {
         //只要后端返回，就去掉loading
@@ -221,6 +235,8 @@ export default defineComponent({
       //在编辑时修改ebook，通过复制一个对象，对原来的值就没有影响了
       //原来这里就类似Java的引用传递，C语言的指针，修改传递的参数，会使原来的传也受影响
       ebook.value = Tool.copy(record);
+      //把一二级分类组合成数组，赋给这个响应式变量，便会自动显示
+      categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
     };
 
     /**
@@ -249,7 +265,30 @@ export default defineComponent({
       });
     };
 
+    const level1 = ref();
+    /**
+     * 查询所有分类
+     **/
+    const handleQueryCategory = () => {
+      loading.value = true;
+      axios.get("/category/all").then((response) => {
+        loading.value = false;
+        const data = response.data;
+        if (data.success) {
+          const categorys = data.content;
+          console.log("原始数组：", categorys);
+
+          level1.value = [];
+          level1.value = Tool.array2Tree(categorys, 0);
+          console.log("树形结构：", level1.value);
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
     onMounted(() => {
+      handleQueryCategory();
       handleQuery({
         //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
         page: 1,
@@ -274,7 +313,9 @@ export default defineComponent({
       ebook,
       modalVisible,
       modalLoading,
-      handleModalOk
+      handleModalOk,
+      categoryIds,
+      level1
     }
   }
 });
