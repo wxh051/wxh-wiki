@@ -3,12 +3,27 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <!--  pagination:分页 loading：等待框，true的话有个等待的效果    -->
+      <!--     查询时构造一个JSON参数对象。这里的pagination是响应式变量，在html用，就不需要去.value了       -->
       <p>
-        <a-button type="primary" @click="add()" size="large">
-          新增
-        </a-button>
+        <a-form layout="inline" :model="param">
+          <a-form-item>
+            <a-input v-model:value="param.name" placeholder="名称">
+              <template #prefix><SmileTwoTone  style="color: rgba(0, 0, 0, 0.25)" /></template>
+            </a-input>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" @click="handleQuery({page: 1, size: pagination.pageSize})">
+              查询
+            </a-button>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" @click="add()">
+              新增
+            </a-button>
+          </a-form-item>
+        </a-form>
       </p>
+      <!--  pagination:分页 loading：等待框，true的话有个等待的效果    -->
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -78,6 +93,10 @@ import {message} from "ant-design-vue";
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
+    //在上面按名字查询时作为参数
+    const param = ref();
+    //初始给一个空对象，不加会报错
+    param.value = {};
     const ebooks = ref();
     const pagination = ref({
       current: 1,
@@ -135,18 +154,19 @@ export default defineComponent({
         //还可以通过拼接URL的方式添加参数
         params: {
           page: params.page,
-          size: params.size
+          size: params.size,
+          name: param.value.name
         }
       }).then((response) => {
         loading.value = false;
         const data = response.data;
-        if(data.success){
+        if (data.success) {
           ebooks.value = data.content.list;
 
           // 重置分页按钮
           pagination.value.current = params.page;
           pagination.value.total = data.content.total;
-        }else{
+        } else {
           message.error(data.message);
         }
       });
@@ -186,7 +206,7 @@ export default defineComponent({
             page: pagination.value.current,
             size: pagination.value.pageSize
           });
-        }else {
+        } else {
           message.error(data.message);
         }
       });
@@ -235,11 +255,14 @@ export default defineComponent({
     });
 
     return {
+      param,
       ebooks,
       pagination,
       columns,
       loading,
       handleTableChange,
+      //handleQuery因为在按名字查询时HTML用到了，所以需要return出去
+      handleQuery,
 
       edit,
       add,
