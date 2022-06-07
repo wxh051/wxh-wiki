@@ -3,7 +3,7 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <!--     查询时构造一个JSON参数对象。这里的pagination是响应式变量，在html用，就不需要去.value了       -->
+      <!--     查询时构造一个JSON参数对象。这里的pagination是响应式变量，在html用，就不需要去.value了；在js里要访问值就得.value       -->
       <p>
         <a-form layout="inline" :model="param">
           <a-form-item>
@@ -219,6 +219,7 @@ export default defineComponent({
     const edit = (record: any) => {
       modalVisible.value = true;
       //在编辑时修改ebook，通过复制一个对象，对原来的值就没有影响了
+      //原来这里就类似Java的引用传递，C语言的指针，修改传递的参数，会使原来的传也受影响
       ebook.value = Tool.copy(record);
     };
 
