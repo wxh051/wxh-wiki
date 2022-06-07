@@ -73,6 +73,7 @@
 <script lang="ts">
 import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
+import {message} from "ant-design-vue";
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -80,7 +81,7 @@ export default defineComponent({
     const ebooks = ref();
     const pagination = ref({
       current: 1,
-      pageSize: 4,
+      pageSize: 10,
       total: 0
     });
     const loading = ref(false);
@@ -139,11 +140,15 @@ export default defineComponent({
       }).then((response) => {
         loading.value = false;
         const data = response.data;
-        ebooks.value = data.content.list;
+        if(data.success){
+          ebooks.value = data.content.list;
 
-        // 重置分页按钮
-        pagination.value.current = params.page;
-        pagination.value.total = data.content.total;
+          // 重置分页按钮
+          pagination.value.current = params.page;
+          pagination.value.total = data.content.total;
+        }else{
+          message.error(data.message);
+        }
       });
     };
 
@@ -169,10 +174,11 @@ export default defineComponent({
       modalLoading.value = true;
       //PSOT请求不需要params参数
       axios.post("/ebook/save", ebook.value).then((response) => {
+        //只要后端返回，就去掉loading
+        modalLoading.value = false;
         const data = response.data;//data=commonResponse
         if (data.success) {
           modalVisible.value = false;
-          modalLoading.value = false;
 
           //重新加载列表，查询当前页
           handleQuery({
@@ -180,6 +186,8 @@ export default defineComponent({
             page: pagination.value.current,
             size: pagination.value.pageSize
           });
+        }else {
+          message.error(data.message);
         }
       });
     };
@@ -210,8 +218,8 @@ export default defineComponent({
         if (data.success) {
           //重新加载列表，查询当前页
           handleQuery({
-            //这两个参数名字必须和后端PageReq中的属性对应起来。这样controller才会将参数映射进去
-            page: pagination.value.current,
+            // page: pagination.value.current,
+            page: 1,
             size: pagination.value.pageSize
           });
         }

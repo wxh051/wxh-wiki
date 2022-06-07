@@ -9,6 +9,8 @@ import com.wxh.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * @author wxh
  * @date 2022-06-02 12:54
@@ -26,9 +28,9 @@ public class EbookController {
     private EbookService ebookService;
 
     @GetMapping("/list")
-    public CommonResp list(EbookQueryReq req){
+    public CommonResp list(@Valid EbookQueryReq req) {
         CommonResp<PageResp<EbookQueryResp>> resp = new CommonResp<>();
-        PageResp<EbookQueryResp> list= ebookService.list(req);
+        PageResp<EbookQueryResp> list = ebookService.list(req);
         resp.setContent(list);
         return resp;
     }
@@ -36,7 +38,7 @@ public class EbookController {
     @PostMapping("/save")
     //@RequestBody这个注解对应的就是JSON方式的post提交，Content-Type: application/json，前端放在body里，后端通过RequestBody才能接收到
     //如果通过form方式提交（x-www-form-urlencoded）则不用加这个注解
-    public CommonResp save(@RequestBody EbookSaveReq req){
+    public CommonResp save(@Valid @RequestBody EbookSaveReq req) {
         CommonResp resp = new CommonResp<>();
         ebookService.save(req);
         return resp;
@@ -44,7 +46,7 @@ public class EbookController {
 
     //使用restful风格
     @DeleteMapping("/delete/{id}")
-    public CommonResp delete(@PathVariable Long id){
+    public CommonResp delete(@PathVariable Long id) {
         CommonResp resp = new CommonResp<>();
         ebookService.delete(id);
         return resp;
