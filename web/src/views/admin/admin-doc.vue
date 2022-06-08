@@ -59,16 +59,17 @@
         <a-input v-model:value="doc.name"/>
       </a-form-item>
       <a-form-item label="父文档">
-        <a-select
-            ref="select"
+        <a-tree-select
             v-model:value="doc.parent"
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            :tree-data="treeSelectData"
+            placeholder="请选择父文档"
+            tree-default-expand-all
+            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
         >
-          <a-select-option value="0">无</a-select-option>
-          <!--          c就是代表一行一行的文档，下面的ID，name和表结构是对应的;HTML使用变量要用{{}}-->
-          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="doc.id===c.id">
-            {{ c.name }}
-          </a-select-option>
-        </a-select>
+          <!--     上面replaceFields中的'id'和'name'两边要加上单引号，是属性的名字     -->
+        </a-tree-select>
       </a-form-item>
       <a-form-item label="顺序">
         <a-input v-model:value="doc.sort"/>
@@ -133,6 +134,8 @@ export default defineComponent({
      **/
     const handleQuery = () => {
       loading.value = true;
+      // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
+      level1.value = [];
       axios.get("/doc/all").then((response) => {
         loading.value = false;
         const data = response.data;
@@ -153,10 +156,16 @@ export default defineComponent({
 
 
     // -------- 表单 ---------
-    //前面三行是定义响应式变量，handleModalOk是点击确定按钮是触发这个方法
+    // 因为level1是要显示在表格里面的，即刚打开界面看到的左侧的文档树。
+    // 但是树选择组件的属性状态，会随当前编辑的节点而变化，所以单独声明一个响应式变量，从level1复制即可。
+    // 比如想在编辑时的树形组件里添加一个“无”，但是这个不用展示在表格中，只在编辑选择的时候修改即可
+    const treeSelectData = ref();
+    treeSelectData.value = [];
+
     const doc = ref({});
     const modalVisible = ref(false);
     const modalLoading = ref(false);
+    //handleModalOk是点击确定按钮是触发这个方法
     const handleModalOk = () => {
       modalLoading.value = true;
       axios.post("/doc/save", doc.value).then((response) => {
@@ -174,11 +183,50 @@ export default defineComponent({
     };
 
     /**
+     * 将某节点及其子孙节点全部置为disabled
+     * 两边设计到两种递归。第一种是递归找到编辑的当前节点，第二种是找到后递归遍历它的子节点
+     */
+    const setDisable = (treeSelectData: any, id: any) => {
+      // console.log(treeSelectData, id);
+      // 遍历数组，即遍历某一层节点
+      for (let i = 0; i < treeSelectData.length; i++) {
+        const node = treeSelectData[i];
+        if (node.id === id) {
+          // 如果当前节点就是目标节点
+          console.log("disabled", node);
+          // 将目标节点设置为disabled
+          node.disabled = true;
+
+          // 遍历所有子节点，将所有子节点全部都加上disabled
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              setDisable(children, children[j].id)
+            }
+          }
+        } else {
+          // 如果当前节点不是目标节点，则到其子节点再找找看。即你编辑的不是当前这级的节点，往下一层找
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            setDisable(children, id);
+          }
+        }
+      }
+    };
+
+    /**
      * 编辑
      */
     const edit = (record: any) => {
       modalVisible.value = true;
       doc.value = Tool.copy(record);
+
+      // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
+      treeSelectData.value = Tool.copy(level1.value);
+      setDisable(treeSelectData.value, record.id);
+
+      // 为选择树添加一个"无"，unshift往前面添加一个元素
+      treeSelectData.value.unshift({id: 0, name: '无'});
     };
 
     /**
@@ -187,6 +235,11 @@ export default defineComponent({
     const add = () => {
       modalVisible.value = true;
       doc.value = {};
+
+      treeSelectData.value = Tool.copy(level1.value);
+
+      // 为选择树添加一个"无"
+      treeSelectData.value.unshift({id: 0, name: '无'});
     };
 
     /**
@@ -222,7 +275,9 @@ export default defineComponent({
       doc,
       modalVisible,
       modalLoading,
-      handleModalOk
+      handleModalOk,
+
+      treeSelectData
     }
   }
 });
