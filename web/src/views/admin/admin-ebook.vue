@@ -37,7 +37,7 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
-        <!--  不带具体字段的值的渲染，text和record是一样的。      -->
+        <!--  不带具体字段的值的渲染，text和record是一样的，代表整列的值。      -->
         <!--  如果渲染绑定了dataIndex，就相当于对数据某一列元素操作，这时候text等于record.dataIndex      -->
         <!--  现在的分类不是一个普通字段，是一种组合，是自定义的显示方式。需要定义一个渲染      -->
         <template v-slot:category="{ text, record }">
