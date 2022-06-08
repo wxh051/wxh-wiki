@@ -192,7 +192,8 @@ export default defineComponent({
     const treeSelectData = ref();
     treeSelectData.value = [];
 
-    const doc = ref({});
+    const doc = ref();
+    doc.value = {};
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     //#就是JS的选择器
@@ -203,6 +204,7 @@ export default defineComponent({
     //handleModalOk是点击确定按钮是触发这个方法
     const handleSave = () => {
       modalLoading.value = true;
+      doc.value.content = editor.txt.html();
       axios.post("/doc/save", doc.value).then((response) => {
         modalLoading.value = false;
         const data = response.data;//data=commonResponse
@@ -285,11 +287,27 @@ export default defineComponent({
     };
 
     /**
+     * 内容查询
+     **/
+    const handleQueryContent = () => {
+      axios.get("/doc/find-content/"+doc.value.id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          editor.txt.html(data.content);
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
+    /**
      * 编辑
      */
     const edit = (record: any) => {
       modalVisible.value = true;
       doc.value = Tool.copy(record);
+      //等到doc上面得到值后，查一下content内容
+      handleQueryContent();
 
       // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
       treeSelectData.value = Tool.copy(level1.value);

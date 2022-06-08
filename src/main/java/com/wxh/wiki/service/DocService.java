@@ -2,8 +2,10 @@ package com.wxh.wiki.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.wxh.wiki.domain.Content;
 import com.wxh.wiki.domain.Doc;
 import com.wxh.wiki.domain.DocExample;
+import com.wxh.wiki.mapper.ContentMapper;
 import com.wxh.wiki.mapper.DocMapper;
 import com.wxh.wiki.req.DocQueryReq;
 import com.wxh.wiki.req.DocSaveReq;
@@ -34,6 +36,9 @@ public class DocService {
     @Autowired
     private SnowFlake snowFlake;
 
+    @Autowired
+    private ContentMapper contentMapper;
+
     public List<DocQueryResp> all() {
         DocExample docExample = new DocExample();
         //排序
@@ -53,19 +58,19 @@ public class DocService {
         DocExample.Criteria criteria = docExample.createCriteria();
 
         //从1开始。只对第一个遇到的select起作用
-        PageHelper.startPage(req.getPage(),req.getSize());
+        PageHelper.startPage(req.getPage(), req.getSize());
         //持久层返回List<Doc>需要转换成List<DocResp>再返回Controller
         List<Doc> docList = docMapper.selectByExample(docExample);
 
-        PageInfo<Doc>pageInfo=new PageInfo<>(docList);
+        PageInfo<Doc> pageInfo = new PageInfo<>(docList);
         //一般前端分页组件只需要total，就会自己计算出pages
-        LOG.info("总行数：{}",pageInfo.getTotal());
-        LOG.info("总页数：{}",pageInfo.getPages());
+        LOG.info("总行数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
 
         //列表复制
         List<DocQueryResp> list = CopyUtil.copyList(docList, DocQueryResp.class);
 
-        PageResp<DocQueryResp>pageResp=new PageResp<>();
+        PageResp<DocQueryResp> pageResp = new PageResp<>();
         pageResp.setTotal(pageInfo.getTotal());
         pageResp.setList(list);
         return pageResp;
@@ -73,29 +78,52 @@ public class DocService {
 
     /**
      * 保存
+     *
      * @param req
      */
     public void save(DocSaveReq req) {
-        Doc doc=CopyUtil.copy(req,Doc.class);
-        if(ObjectUtils.isEmpty(req.getId())){
+        //doc.id==content.id
+        Doc doc = CopyUtil.copy(req, Doc.class);
+        Content content = CopyUtil.copy(req, Content.class);
+        if (ObjectUtils.isEmpty(req.getId())) {
             //新增
             doc.setId(snowFlake.nextId());
             docMapper.insert(doc);
-        }else {
+
+            //这里不能再通过雪花算法获取了，而是直接去获取doc的ID，他两是一样的必须
+            content.setId(doc.getId());
+            contentMapper.insert(content);
+        } else {
             //更新
             docMapper.updateByPrimaryKey(doc);
+            //BLOB代表对一个大字段的更新
+            int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            if (count == 0) {
+                contentMapper.insert(content);
+            }
         }
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         docMapper.deleteByPrimaryKey(id);
     }
 
     //这里传入一个也string可以
-    public void delete(List<String> ids){
+    public void delete(List<String> ids) {
         DocExample docExample = new DocExample();
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andIdIn(ids);
         docMapper.deleteByExample(docExample);
     }
+
+    public String  findContent(Long id){
+        Content content = contentMapper.selectByPrimaryKey(id);
+        if(!ObjectUtils.isEmpty(content)){
+            return content.getContent();
+        }else{
+            return "";
+        }
+    }
 }
+
+
