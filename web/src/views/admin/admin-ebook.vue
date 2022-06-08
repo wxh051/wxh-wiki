@@ -47,7 +47,7 @@
         <!--    默认提供text和record，text表示当前要渲染的字段的值，record表示这一行记录，可以通过record.id来获得这一行的id -->
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <router-link to="/admin/doc">
+            <router-link :to="'/admin/doc?ebookId='+record.id">
               <a-button type="primary">
                 文档管理
               </a-button>
