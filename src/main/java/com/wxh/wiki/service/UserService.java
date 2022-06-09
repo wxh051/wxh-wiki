@@ -87,7 +87,9 @@ public class UserService {
             }
         } else {
             // 更新
-            userMapper.updateByPrimaryKey(user);
+            //加上selective代表user里面的属性有值，才去更新这个字段。没有则不会更新这个字段。所以可设置一下为空
+            user.setLoginName(null);
+            userMapper.updateByPrimaryKeySelective(user);
         }
     }
 

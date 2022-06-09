@@ -11,11 +11,17 @@
           </a-form-item>
           <a-form-item>
             <a-button type="primary" @click="handleQuery({page: 1, size: pagination.pageSize})">
+              <template #icon>
+                <SearchOutlined/>
+              </template>
               查询
             </a-button>
           </a-form-item>
           <a-form-item>
             <a-button type="primary" @click="add()">
+              <template #icon>
+                <DingdingOutlined/>
+              </template>
               新增
             </a-button>
           </a-form-item>
@@ -31,7 +37,11 @@
       >
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <a-button type="primary" @click="edit(record)">
+            <!--     ghost 将按钮样式设为幽灵状态，即中间不填充背景色       -->
+            <a-button type="primary" ghost @click="edit(record)">
+              <template #icon>
+                <EditFilled/>
+              </template>
               编辑
             </a-button>
             <a-popconfirm
@@ -40,7 +50,10 @@
                 cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
-              <a-button type="danger">
+              <a-button danger>
+                <template #icon>
+                  <DeleteOutlined/>
+                </template>
                 删除
               </a-button>
             </a-popconfirm>
@@ -58,22 +71,23 @@
   >
     <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="登陆名">
-        <a-input v-model:value="user.loginName" />
+        <!--    使用！！绕过类型检验    -->
+        <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
       </a-form-item>
       <a-form-item label="昵称">
-        <a-input v-model:value="user.name" />
+        <a-input v-model:value="user.name"/>
       </a-form-item>
       <a-form-item label="密码">
-        <a-input v-model:value="user.password" />
+        <a-input v-model:value="user.password"/>
       </a-form-item>
     </a-form>
   </a-modal>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
-import { message } from 'ant-design-vue';
+import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
 
 export default defineComponent({
@@ -105,7 +119,7 @@ export default defineComponent({
       {
         title: 'Action',
         key: 'action',
-        slots: { customRender: 'action' }
+        slots: {customRender: 'action'}
       }
     ];
 
