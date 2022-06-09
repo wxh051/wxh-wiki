@@ -7,10 +7,12 @@ import com.wxh.wiki.domain.UserExample;
 import com.wxh.wiki.exception.BusinessException;
 import com.wxh.wiki.exception.BusinessExceptionCode;
 import com.wxh.wiki.mapper.UserMapper;
+import com.wxh.wiki.req.UserLoginReq;
 import com.wxh.wiki.req.UserQueryReq;
 import com.wxh.wiki.req.UserResetPasswordReq;
 import com.wxh.wiki.req.UserSaveReq;
 import com.wxh.wiki.resp.PageResp;
+import com.wxh.wiki.resp.UserLoginResp;
 import com.wxh.wiki.resp.UserQueryResp;
 import com.wxh.wiki.util.CopyUtil;
 import com.wxh.wiki.util.SnowFlake;
@@ -120,6 +122,28 @@ public class UserService {
         //根据req复制后，user里只有ID和password有值
         User user = CopyUtil.copy(req, User.class);
         userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    /**
+     * 登录
+     */
+    public UserLoginResp login(UserLoginReq req) {
+        User userDb = selectByLoginName(req.getLoginName());
+        if(ObjectUtils.isEmpty(userDb)){
+            //用户名不存在
+            LOG.info("用户名不存在,{}",req.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        }else {
+            if(userDb.getPassword().equals(req.getPassword())){
+                //登录成功
+                UserLoginResp userLoginResp=CopyUtil.copy(userDb,UserLoginResp.class);
+                return userLoginResp;
+            }else{
+                //密码不对
+                LOG.info("密码不对，输入密码：{}，数据库密码：{}",req.getPassword(),userDb.getPassword());
+                throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            }
+        }
     }
 }
 

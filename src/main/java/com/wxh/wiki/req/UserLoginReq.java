@@ -7,21 +7,22 @@ import javax.validation.constraints.Pattern;
  * @author wxh
  * @date 2022-06-09 14:50
  */
-public class UserResetPasswordReq {
-    private Long id;
+public class UserLoginReq {
+
+    @NotNull(message = "【用户名】不能为空")
+    private String loginName;
 
     @NotNull(message = "【密码】不能为空")
     // @Length(min = 6, max = 20, message = "【密码】6~20位")
-    //前端经过加密后，这里的校验其实没意义了，应该在前端加密码的正则校验。加密后的长度早以超了20位
-    @Pattern(regexp = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$", message = "【密码】至少包含 数字和英文，长度6-32")
+    @Pattern(regexp = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$", message = "【密码】密码规则不正确")
     private String password;
 
-    public Long getId() {
-        return id;
+    public String getLoginName() {
+        return loginName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 
     public String getPassword() {
@@ -38,7 +39,7 @@ public class UserResetPasswordReq {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
+        sb.append(", loginName=").append(loginName);
         sb.append(", password=").append(password);
         sb.append("]");
         return sb.toString();
