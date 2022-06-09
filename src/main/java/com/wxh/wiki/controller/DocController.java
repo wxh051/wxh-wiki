@@ -24,7 +24,7 @@ public class DocController {
     @Autowired
     private DocService docService;
 
-    @GetMapping("/all{ebookId}")
+    @GetMapping("/all/{ebookId}")
     public CommonResp all(@PathVariable Long ebookId) {
         CommonResp<List<DocQueryResp>> resp = new CommonResp<>();
         List<DocQueryResp> list = docService.all(ebookId);

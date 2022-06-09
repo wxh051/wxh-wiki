@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, createVNode } from 'vue';
+import {defineComponent, onMounted, ref, createVNode} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
@@ -50,7 +50,7 @@ export default defineComponent({
      * 数据查询
      **/
     const handleQuery = () => {
-      axios.get("/doc/all"+route.query.ebookId).then((response) => {
+      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
         const data = response.data;
         if (data.success) {
           docs.value = data.content;
