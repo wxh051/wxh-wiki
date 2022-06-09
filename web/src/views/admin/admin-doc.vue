@@ -198,7 +198,8 @@ export default defineComponent({
 
           //在这里进行一些初始化，这样就可以不用非得点一下新增，才能进行父文档的选择
           // 父文档下拉框初始化，相当于点击新增
-          treeSelectData.value = Tool.copy(level1.value);
+          //加上|| []解决如果一个电子书初始没有文档，没法添加父文档的问题
+          treeSelectData.value = Tool.copy(level1.value) || [];
           // 为选择树添加一个"无"
           treeSelectData.value.unshift({id: 0, name: '无'});
         } else {
@@ -352,7 +353,7 @@ export default defineComponent({
         ebookId: route.query.ebookId
       };
 
-      treeSelectData.value = Tool.copy(level1.value);
+      treeSelectData.value = Tool.copy(level1.value) || [];
 
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
