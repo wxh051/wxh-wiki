@@ -2,9 +2,12 @@ package com.wxh.wiki.mapper;
 
 import com.wxh.wiki.domain.User;
 import com.wxh.wiki.domain.UserExample;
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
+@Mapper
 public interface UserMapper {
     long countByExample(UserExample example);
 
