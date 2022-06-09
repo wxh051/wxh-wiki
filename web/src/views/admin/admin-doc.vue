@@ -194,8 +194,8 @@ export default defineComponent({
 
     const doc = ref();
     doc.value = {};
-    const modalVisible = ref(false);
-    const modalLoading = ref(false);
+    // const modalVisible = ref(false);
+    // const modalLoading = ref(false);
     //#就是JS的选择器
     const editor = new E('#content');
     //zIndex覆盖层级大小，越大就会排在越顶级，把其他元素挡住。这里是为了在编辑文档时，不把它的元素（如树形下拉框）挡住
@@ -203,14 +203,14 @@ export default defineComponent({
 
     //handleModalOk是点击确定按钮是触发这个方法
     const handleSave = () => {
-      modalLoading.value = true;
+      // modalLoading.value = true;
       doc.value.content = editor.txt.html();
       axios.post("/doc/save", doc.value).then((response) => {
-        modalLoading.value = false;
+        // modalLoading.value = false;
         const data = response.data;//data=commonResponse
         if (data.success) {
-          modalVisible.value = false;
-
+          // modalVisible.value = false;
+          message.success("保存成功！");
           //重新加载列表，查询当前页
           handleQuery();
         } else {
@@ -304,7 +304,10 @@ export default defineComponent({
      * 编辑
      */
     const edit = (record: any) => {
-      modalVisible.value = true;
+      //编辑时清空文本框
+      editor.txt.html("");
+
+      // modalVisible.value = true;
       doc.value = Tool.copy(record);
       //等到doc上面得到值后，查一下content内容
       handleQueryContent();
@@ -321,7 +324,10 @@ export default defineComponent({
      * 新增
      */
     const add = () => {
-      modalVisible.value = true;
+      //清空文本框
+      editor.txt.html("");
+
+      // modalVisible.value = true;
       doc.value = {
         ebookId: route.query.ebookId
       };
@@ -377,8 +383,8 @@ export default defineComponent({
       handleDelete,
 
       doc,
-      modalVisible,
-      modalLoading,
+      // modalVisible,
+      // modalLoading,
       handleSave,
 
       treeSelectData
