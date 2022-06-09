@@ -90,6 +90,10 @@ import axios from 'axios';
 import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
 
+//告诉文件这两个变量是存在的。使用第三方的js，可以先在这定义一下，即使这里的md5是全局的。但是我好像没加也没有报错
+declare let hexMd5: any;
+declare let KEY: any;
+
 export default defineComponent({
   name: 'AdminUser',
   setup() {
@@ -168,6 +172,8 @@ export default defineComponent({
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
+      //KEY是一个盐值，使密文更难以破解
+      user.value.password = hexMd5(user.value.password + KEY);
       axios.post("/user/save", user.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
