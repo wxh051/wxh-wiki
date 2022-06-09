@@ -1,9 +1,19 @@
 <template>
   <a-layout-header class="header">
     <div class="logo"/>
-    <!--  a标签支持点击，按钮也可以，但是会有个边框    -->
-    <!--  做一个互斥，只显示一个    -->
     <div>
+      <a-popconfirm
+          title="确认退出登录?"
+          ok-text="是"
+          cancel-text="否"
+          @confirm="logout()"
+      >
+        <!--  a标签支持点击，按钮也可以，但是会有个边框    -->
+        <!--  做一个互斥，只显示一个    -->
+        <a class="login-menu" v-show="user.id">
+          <span>退出登录</span>
+        </a>
+      </a-popconfirm>
       <a class="login-menu" v-show="user.id">
         <span>您好：{{ user.name }}</span>
       </a>
@@ -107,13 +117,28 @@ export default defineComponent({
       });
     };
 
+    // 退出登录
+    const logout = () => {
+      console.log("退出登录");
+      axios.get('/user/logout/' + user.value.token).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          message.success("退出登录成功！");
+          store.commit("setUser", {});
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
     return {
       loginModalVisible,
       loginModalLoading,
       showLoginModal,
       loginUser,
       login,
-      user
+      user,
+      logout
     }
   }
 });
@@ -124,5 +149,6 @@ export default defineComponent({
 .login-menu {
   float: right;
   color: white;
+  padding-left: 10px;
 }
 </style>
