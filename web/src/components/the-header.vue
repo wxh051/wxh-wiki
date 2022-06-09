@@ -1,6 +1,10 @@
 <template>
   <a-layout-header class="header">
     <div class="logo"/>
+    <!--  a标签支持点击，按钮也可以，但是会有个边框    -->
+    <a class="login-menu" @click="showLoginModal">
+      <span>登录</span>
+    </a>
     <a-menu
         theme="dark"
         mode="horizontal"
@@ -32,13 +36,61 @@
         </router-link>
       </a-menu-item>
     </a-menu>
+
+    <a-modal
+        title="登录"
+        v-model:visible="loginModalVisible"
+        :confirm-loading="loginModalLoading"
+        @ok="login"
+    >
+      <a-form :model="loginUser" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+        <a-form-item label="登录名">
+          <a-input v-model:value="loginUser.loginName" />
+        </a-form-item>
+        <a-form-item label="密码">
+          <a-input v-model:value="loginUser.password" type="password" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </a-layout-header>
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
+import {defineComponent,ref} from 'vue';
 
 export default defineComponent({
-  name: 'the-header'
+  name: 'the-header',
+  setup () {
+    const loginUser = ref({
+      loginName: "test",
+      password: "test"
+    });
+    const loginModalVisible = ref(false);
+    const loginModalLoading = ref(false);
+    const showLoginModal = () => {
+      loginModalVisible.value = true;
+    };
+
+    // 登录
+    const login = () => {
+      console.log("开始登录")
+    };
+
+    return {
+      loginModalVisible,
+      loginModalLoading,
+      showLoginModal,
+      loginUser,
+      login
+    }
+  }
 });
 </script>
+
+<!--登录标签放到右边-->
+<style>
+.login-menu {
+  float: right;
+  color: white;
+}
+</style>
