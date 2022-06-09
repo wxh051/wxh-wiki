@@ -8,6 +8,7 @@ import com.wxh.wiki.exception.BusinessException;
 import com.wxh.wiki.exception.BusinessExceptionCode;
 import com.wxh.wiki.mapper.UserMapper;
 import com.wxh.wiki.req.UserQueryReq;
+import com.wxh.wiki.req.UserResetPasswordReq;
 import com.wxh.wiki.req.UserSaveReq;
 import com.wxh.wiki.resp.PageResp;
 import com.wxh.wiki.resp.UserQueryResp;
@@ -110,6 +111,15 @@ public class UserService {
             //本来就只有一条
             return userList.get(0);
         }
+    }
+
+    /**
+     * 修改密码
+     */
+    public void resetPassword(UserResetPasswordReq req) {
+        //根据req复制后，user里只有ID和password有值
+        User user = CopyUtil.copy(req, User.class);
+        userMapper.updateByPrimaryKeySelective(user);
     }
 }
 

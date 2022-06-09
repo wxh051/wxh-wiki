@@ -1,6 +1,7 @@
 package com.wxh.wiki.controller;
 
 import com.wxh.wiki.req.UserQueryReq;
+import com.wxh.wiki.req.UserResetPasswordReq;
 import com.wxh.wiki.req.UserSaveReq;
 import com.wxh.wiki.resp.CommonResp;
 import com.wxh.wiki.resp.PageResp;
@@ -46,4 +47,15 @@ public class UserController {
         userService.delete(id);
         return resp;
     }
+
+    @PostMapping("/reset-password")
+    public CommonResp resetPassword(@Valid @RequestBody UserResetPasswordReq req) {
+        //把密码设为一个32位的16进制的字符串
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp resp = new CommonResp<>();
+        userService.resetPassword(req);
+        return resp;
+    }
 }
+
+
