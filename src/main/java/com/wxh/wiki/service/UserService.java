@@ -89,6 +89,8 @@ public class UserService {
             // 更新
             //加上selective代表user里面的属性有值，才去更新这个字段。没有则不会更新这个字段。所以可设置一下为空
             user.setLoginName(null);
+            //密码也清空，编辑时不修改密码
+            user.setPassword(null);
             userMapper.updateByPrimaryKeySelective(user);
         }
     }
