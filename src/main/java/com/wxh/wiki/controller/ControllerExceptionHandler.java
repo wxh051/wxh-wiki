@@ -1,5 +1,6 @@
 package com.wxh.wiki.controller;
 
+import com.wxh.wiki.exception.BusinessException;
 import com.wxh.wiki.resp.CommonResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class ControllerExceptionHandler {
 
     /**
      * 有针对性性的对@BindException校验异常统一处理
+     *
      * @param e
      * @return
      */
@@ -30,6 +32,34 @@ public class ControllerExceptionHandler {
         LOG.warn("参数校验失败：{}", e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
         commonResp.setSuccess(false);
         commonResp.setMessage(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return commonResp;
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(value = BusinessException.class)
+    @ResponseBody
+    public CommonResp validExceptionHandler(BusinessException e) {
+        CommonResp commonResp = new CommonResp();
+        LOG.warn("业务异常：{}", e.getCode().getDesc());
+        commonResp.setSuccess(false);
+        commonResp.setMessage(e.getCode().getDesc());
+        return commonResp;
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public CommonResp validExceptionHandler(Exception e) {
+        CommonResp commonResp = new CommonResp();
+        LOG.error("系统异常：", e);
+        commonResp.setSuccess(false);
+        commonResp.setMessage("系统出现异常");
         return commonResp;
     }
 }

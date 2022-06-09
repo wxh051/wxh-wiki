@@ -13,7 +13,9 @@
         </router-link>
       </a-menu-item>
       <a-menu-item key="/admin/user">
-        <router-link to="/admin/user">用户管理</router-link>
+        <router-link to="/admin/user">
+          用户管理
+        </router-link>
       </a-menu-item>
       <a-menu-item key="/admin/ebook">
         <router-link to="/admin/ebook">
@@ -35,8 +37,9 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
-  export default defineComponent({
-    name: 'the-header'
-  });
+import {defineComponent} from 'vue';
+
+export default defineComponent({
+  name: 'the-header'
+});
 </script>
