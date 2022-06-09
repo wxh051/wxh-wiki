@@ -39,8 +39,11 @@ public class DocService {
     @Autowired
     private ContentMapper contentMapper;
 
-    public List<DocQueryResp> all() {
+    public List<DocQueryResp> all(Long ebookId) {
         DocExample docExample = new DocExample();
+        //必须这么写，这时ebookid=null,则搜不到任何文档
+        //如果写成动态查询，有就查，没有就查出所有文档，不安全
+        docExample.createCriteria().andEbookIdEqualTo(ebookId);
         //排序
         docExample.setOrderByClause("sort asc");
         List<Doc> docList = docMapper.selectByExample(docExample);
