@@ -3,12 +3,14 @@
     <div class="logo"/>
     <!--  a标签支持点击，按钮也可以，但是会有个边框    -->
     <!--  做一个互斥，只显示一个    -->
-    <a class="login-menu" v-show="user.id">
-      <span>您好：{{ user.name }}</span>
-    </a>
-    <a class="login-menu" v-show="!user.id" @click="showLoginModal">
-      <span>登录</span>
-    </a>
+    <div>
+      <a class="login-menu" v-show="user.id">
+        <span>您好：{{ user.name }}</span>
+      </a>
+      <a class="login-menu" v-show="!user.id" @click="showLoginModal">
+        <span>登录</span>
+      </a>
+    </div>
     <a-menu
         theme="dark"
         mode="horizontal"
@@ -60,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue';
+import {computed, defineComponent, ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
 import store from "@/store";
@@ -72,9 +74,9 @@ export default defineComponent({
   name: 'the-header',
   setup() {
     //登录后保存
-    const user = ref();
-    //和往常一样，设置个空对象，避免上面v-show="user.id"判断时出现空指针
-    user.value = {};
+    const user = computed(() =>
+        store.state.user
+    );
 
     //用来登录
     const loginUser = ref({
@@ -98,8 +100,7 @@ export default defineComponent({
         if (data.success) {
           loginModalVisible.value = false;
           message.success("登录成功！");
-          user.value = data.content;
-          store.commit("setUser",user.value);
+          store.commit("setUser", data.content);
         } else {
           message.error(data.message);
         }

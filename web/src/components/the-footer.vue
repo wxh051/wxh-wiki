@@ -1,6 +1,6 @@
 <template>
   <a-layout-footer style="text-align: center;height: 80px;width: 100%">
-    xh电子书{{ user.name }}
+    xh电子书<span v-show="user.id">，欢迎：{{ user.name }}</span>
   </a-layout-footer>
 </template>
 
