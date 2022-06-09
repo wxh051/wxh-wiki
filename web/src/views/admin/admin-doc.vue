@@ -210,7 +210,10 @@ export default defineComponent({
 
     // -------- 表单 ---------
     const doc = ref();
-    doc.value = {};
+    //初始时就赋一个ebookId，这样就可以直接在界面保存。不然就会显示“电子书不能为空”
+    doc.value = {
+      ebookId: route.query.ebookId
+    };
     // const modalVisible = ref(false);
     // const modalLoading = ref(false);
     //#就是JS的选择器
