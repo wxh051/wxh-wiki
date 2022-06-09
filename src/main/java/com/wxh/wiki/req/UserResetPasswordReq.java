@@ -1,6 +1,6 @@
 package com.wxh.wiki.req;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 /**
@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 public class UserResetPasswordReq {
     private Long id;
 
-    @NotNull(message = "【密码】不能为空")
+    @NotEmpty(message = "【密码】不能为空")
     // @Length(min = 6, max = 20, message = "【密码】6~20位")
     //前端经过加密后，这里的校验其实没意义了，应该在前端加密码的正则校验。加密后的长度早以超了20位
     @Pattern(regexp = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$", message = "【密码】至少包含 数字和英文，长度6-32")

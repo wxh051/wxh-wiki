@@ -1,6 +1,6 @@
 package com.wxh.wiki.req;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @author wxh
@@ -8,16 +8,16 @@ import javax.validation.constraints.NotNull;
 public class DocSaveReq {
     private Long id;
 
-    @NotNull(message = "【电子书】不能为空")
+    @NotEmpty(message = "【电子书】不能为空")
     private Long ebookId;
 
-    @NotNull(message = "【父文档】不能为空")
+    @NotEmpty(message = "【父文档】不能为空")
     private Long parent;
 
-    @NotNull(message = "【名称】不能为空")
+    @NotEmpty(message = "【名称】不能为空")
     private String name;
 
-    @NotNull(message = "【顺序】不能为空")
+    @NotEmpty(message = "【顺序】不能为空")
     private Integer sort;
 
     private Integer viewCount;
@@ -32,7 +32,7 @@ public class DocSaveReq {
         this.content = content;
     }
 
-    @NotNull(message = "【内容】不能为空")
+    @NotEmpty(message = "【内容】不能为空")
     private String content;
 
     public Long getId() {
