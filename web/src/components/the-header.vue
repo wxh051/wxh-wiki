@@ -73,6 +73,7 @@
 
 <script lang="ts">
 import {computed, defineComponent, ref} from 'vue';
+import {useRouter} from "vue-router";
 import axios from 'axios';
 import {message} from 'ant-design-vue';
 import store from "@/store";
@@ -83,6 +84,8 @@ declare let KEY: any;
 export default defineComponent({
   name: 'the-header',
   setup() {
+    const router = useRouter();
+
     //登录后保存
     const user = computed(() =>
         store.state.user
@@ -125,6 +128,7 @@ export default defineComponent({
         if (data.success) {
           message.success("退出登录成功！");
           store.commit("setUser", {});
+          router.push("/");
         } else {
           message.error(data.message);
         }
