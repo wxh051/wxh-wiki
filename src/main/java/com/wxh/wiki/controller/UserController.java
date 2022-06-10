@@ -84,7 +84,8 @@ public class UserController {
         LOG.info("生成单点登录token，{}并放入redis",token);
         //token随着用户信息返回给前端
         userLoginResp.setToken(token.toString());
-        redisTemplate.opsForValue().set(token, JSONObject.toJSONString(userLoginResp),3600*24, TimeUnit.SECONDS);
+        //前端传进来的token也是个string（下面delete方法中接受到的），这里直接存成string类型
+        redisTemplate.opsForValue().set(token.toString(), JSONObject.toJSONString(userLoginResp),3600*24, TimeUnit.SECONDS);
 
         resp.setContent(userLoginResp);
         return resp;
