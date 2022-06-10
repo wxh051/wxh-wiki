@@ -59,11 +59,17 @@
         :confirm-loading="loginModalLoading"
         @ok="login"
     >
-      <a-form :model="loginUser" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-        <a-form-item label="登录名">
+      <a-form
+          :model="loginUser"
+          :label-col="{ span: 6 }"
+          :wrapper-col="{ span: 18 }"
+          :rules="rules"
+          ref="formRef"
+      >
+        <a-form-item has-feedback label="登录名" name="loginName">
           <a-input v-model:value="loginUser.loginName"/>
         </a-form-item>
-        <a-form-item label="密码">
+        <a-form-item has-feedback label="密码" name="password">
           <a-input v-model:value="loginUser.password" type="password"/>
         </a-form-item>
       </a-form>
@@ -77,6 +83,7 @@ import {useRouter} from "vue-router";
 import axios from 'axios';
 import {message} from 'ant-design-vue';
 import store from "@/store";
+import {ValidateErrorEntity} from 'ant-design-vue/es/form/interface';
 
 declare let hexMd5: any;
 declare let KEY: any;
@@ -84,6 +91,10 @@ declare let KEY: any;
 export default defineComponent({
   name: 'the-header',
   setup() {
+    //用于登录信息校验
+    const formRef = ref();
+
+    //用于退出登录时跳转到首页
     const router = useRouter();
 
     //登录后保存
@@ -96,13 +107,54 @@ export default defineComponent({
       loginName: "test",
       password: "123"
     });
+
     const loginModalVisible = ref(false);
     const loginModalLoading = ref(false);
     const showLoginModal = () => {
       loginModalVisible.value = true;
     };
 
+    //登录时检验密码和账号
+    const rules = {
+      loginName: [
+        {required: true, message: '名称为空，请重新输入', trigger: 'blur'},
+      ],
+      password: [
+        {required: true, message: '密码为空，请重新输入', trigger: ['change', 'blur']},
+        {min: 6, max: 20, message: '密码长度最低为6位，最高为20位', trigger: ['change', 'blur']},
+        {
+          trigger: ['change', 'blur'],
+          message: '密码强度太低，至少包含数字和字母',
+          pattern: '^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$',
+        }
+      ],
+    };
+
     // 登录
+    const login = () => {
+      formRef.value.validate().then(() => {
+        console.log("开始登录");
+        loginModalLoading.value = true;
+        //这个位置可以加一些前端的校验
+        loginUser.value.password = hexMd5(loginUser.value.password + KEY);
+        axios.post('/user/login', loginUser.value).then((response) => {
+          loginModalLoading.value = false;
+          const data = response.data;
+          if (data.success) {
+            loginModalVisible.value = false;
+            message.success("登录成功！");
+            store.commit("setUser", data.content);
+          } else {
+            message.error(data.message);
+          }
+        });
+      })
+          .catch((error: ValidateErrorEntity) => {
+            message.error('登录信息不符号要求');
+          });
+    };
+
+    /*// 登录
     const login = () => {
       console.log("开始登录");
       loginModalLoading.value = true;
@@ -118,7 +170,7 @@ export default defineComponent({
           message.error(data.message);
         }
       });
-    };
+    };*/
 
     // 退出登录
     const logout = () => {
@@ -142,7 +194,10 @@ export default defineComponent({
       loginUser,
       login,
       user,
-      logout
+      logout,
+
+      rules,
+      formRef
     }
   }
 });
