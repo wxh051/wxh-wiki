@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author wxh
@@ -18,6 +19,7 @@ import org.springframework.core.env.Environment;
 @ComponentScan("com.wxh")
 @MapperScan("com.wxh.wiki.mapper")
 @SpringBootApplication
+@EnableScheduling
 public class WikiApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(WikiApplication.class);
