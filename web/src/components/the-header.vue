@@ -104,8 +104,8 @@ export default defineComponent({
 
     //用来登录
     const loginUser = ref({
-      loginName: "test",
-      password: "123"
+      loginName: "xhxh",
+      password: "wxhtobe1"
     });
 
     const loginModalVisible = ref(false);
