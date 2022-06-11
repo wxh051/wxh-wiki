@@ -6,6 +6,8 @@ import com.wxh.wiki.domain.Content;
 import com.wxh.wiki.domain.ContentExample;
 import com.wxh.wiki.domain.Doc;
 import com.wxh.wiki.domain.DocExample;
+import com.wxh.wiki.exception.BusinessException;
+import com.wxh.wiki.exception.BusinessExceptionCode;
 import com.wxh.wiki.mapper.ContentMapper;
 import com.wxh.wiki.mapper.DocMapper;
 import com.wxh.wiki.mapper.DocMapperCust;
@@ -14,6 +16,8 @@ import com.wxh.wiki.req.DocSaveReq;
 import com.wxh.wiki.resp.DocQueryResp;
 import com.wxh.wiki.resp.PageResp;
 import com.wxh.wiki.util.CopyUtil;
+import com.wxh.wiki.util.RedisUtil;
+import com.wxh.wiki.util.RequestContext;
 import com.wxh.wiki.util.SnowFlake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +47,9 @@ public class DocService {
 
     @Autowired
     private DocMapperCust docMapperCust;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     public List<DocQueryResp> all(Long ebookId) {
         DocExample docExample = new DocExample();
@@ -127,19 +134,19 @@ public class DocService {
         docMapper.deleteByExample(docExample);
 
         //删除文档内容
-        ContentExample contentExample=new ContentExample();
-        ContentExample.Criteria criteria1=contentExample.createCriteria();
+        ContentExample contentExample = new ContentExample();
+        ContentExample.Criteria criteria1 = contentExample.createCriteria();
         criteria1.andIdIn(ids);
         contentMapper.deleteByExample(contentExample);
     }
 
-    public String  findContent(Long id){
+    public String findContent(Long id) {
         Content content = contentMapper.selectByPrimaryKey(id);
         //文档阅读数加一
         docMapperCust.increaseViewCount(id);
-        if(!ObjectUtils.isEmpty(content)){
+        if (!ObjectUtils.isEmpty(content)) {
             return content.getContent();
-        }else{
+        } else {
             return "";
         }
     }
@@ -147,9 +154,17 @@ public class DocService {
     /**
      * 点赞
      */
-    public void vote(Long id){
-        docMapperCust.increaseVoteCount(id);
+    public void vote(Long id) {
+        // docMapperCust.increaseVoteCount(id);
+        // 远程IP+doc.id作为key，24小时内不能重复
+        String ip = RequestContext.getRemoteAddr();
+        if (redisUtil.validateRepeat("DOC_VOTE_" + id + "_" + ip, 3600 * 24)) {
+            docMapperCust.increaseVoteCount(id);
+        } else {
+            throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
+        }
     }
+
 }
 
 
