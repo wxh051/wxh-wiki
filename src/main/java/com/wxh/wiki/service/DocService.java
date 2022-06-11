@@ -165,6 +165,11 @@ public class DocService {
         }
     }
 
+    //在这里调用定时器需要的SQL语句，定时器通过service调用。避免job直接调用mapper
+    public void updateEbookInfo(){
+        docMapperCust.updateEbookInfo();
+    }
+
 }
 
 
