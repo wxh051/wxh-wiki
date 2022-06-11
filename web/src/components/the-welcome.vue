@@ -106,10 +106,19 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           const statisticResp = data.content;
-          statistic.value.viewCount = statisticResp[1].viewCount;
-          statistic.value.voteCount = statisticResp[1].voteCount;
-          statistic.value.todayViewCount = statisticResp[1].viewIncrease;
-          statistic.value.todayVoteCount = statisticResp[1].voteIncrease;
+          // 如果只有今天的记录 说明查出的数组内只有1条，那就用下标为0的今天的数据。
+          if (statisticResp.length <= 1) {
+            statistic.value.viewCount = statisticResp[0].viewCount;
+            statistic.value.voteCount = statisticResp[0].voteCount;
+            statistic.value.todayViewCount = statisticResp[0].viewIncrease;
+            statistic.value.todayVoteCount = statisticResp[0].voteIncrease;
+            // 如果存在前一天的数据，说明有两条，则取下标为1的数据。
+          } else {
+            statistic.value.viewCount = statisticResp[1].viewCount;
+            statistic.value.voteCount = statisticResp[1].voteCount;
+            statistic.value.todayViewCount = statisticResp[1].viewIncrease;
+            statistic.value.todayVoteCount = statisticResp[1].voteIncrease;
+          }
 
           // 按分钟计算当前时间点，占一天的百分比
           const now = new Date();
@@ -118,10 +127,13 @@ export default defineComponent({
           // console.log(nowRate)
           //今天预计=今天到目前的阅读量/（当前时间点占一天的百分比）
           statistic.value.todayViewIncrease = parseInt(String(statisticResp[1].viewIncrease / nowRate));
-          // todayViewIncreaseRate：今日预计增长率
-          // 今天增长率=（今天预计-昨天）/昨天
+
+          // 判断昨日阅读增长是否为0，为0则改为1
+          const viewIncrease0 = statisticResp[0].viewIncrease === 0 ? 1 : statisticResp[0].viewIncrease;
+          // todayViewIncreaseRate：今天增长率=（今天预计-昨天）/昨天
           // 正值（负值）：显示一个向上（向下）的箭头
-          statistic.value.todayViewIncreaseRate = (statistic.value.todayViewIncrease - statisticResp[0].viewIncrease) / statisticResp[0].viewIncrease * 100;
+          statistic.value.todayViewIncreaseRate = (statistic.value.todayViewIncrease - statisticResp[0].viewIncrease)
+              / viewIncrease0 * 100;
           // 真正显示的增长率（绝对值）
           statistic.value.todayViewIncreaseRateAbs = Math.abs(statistic.value.todayViewIncreaseRate);
         }
