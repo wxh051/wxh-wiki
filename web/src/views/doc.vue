@@ -26,6 +26,13 @@
           </div>
           <!--     这里显示的内容和wangeditor没关系，是个HTML渲染     -->
           <div class="wangeditor" :innerHTML="html"></div>
+          <div class="vote-div">
+            <a-button type="primary" shape="round" :size="'large'" @click="vote">
+              <template #icon>
+                <LikeOutlined/> &nbsp;点赞：{{ doc.voteCount }}
+              </template>
+            </a-button>
+          </div>
         </a-col>
       </a-row>
     </a-layout-content>
@@ -116,6 +123,19 @@ export default defineComponent({
       }
     };
 
+    //点赞
+    const vote = () => {
+      axios.get('/doc/vote/' + doc.value.id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          //前端自增一，就不用去后端取数据了
+          doc.value.voteCount++;
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
 
     onMounted(() => {
       handleQuery();
@@ -126,7 +146,8 @@ export default defineComponent({
       html,
       onSelect,
       defaultSelectedKeys,
-      doc
+      doc,
+      vote
     }
   }
 });
@@ -192,5 +213,11 @@ export default defineComponent({
   margin: 20px 10px !important;
   font-size: 16px !important;
   font-weight: 600;
+}
+
+/* 点赞 */
+.vote-div {
+  padding: 15px;
+  text-align: center;
 }
 </style>

@@ -143,6 +143,13 @@ public class DocService {
             return "";
         }
     }
+
+    /**
+     * 点赞
+     */
+    public void vote(Long id){
+        docMapperCust.increaseVoteCount(id);
+    }
 }
 
 
