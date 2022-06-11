@@ -2,8 +2,10 @@ package com.wxh.wiki.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.wxh.wiki.domain.DocExample;
 import com.wxh.wiki.domain.Ebook;
 import com.wxh.wiki.domain.EbookExample;
+import com.wxh.wiki.mapper.DocMapper;
 import com.wxh.wiki.mapper.EbookMapper;
 import com.wxh.wiki.req.EbookQueryReq;
 import com.wxh.wiki.req.EbookSaveReq;
@@ -32,6 +34,9 @@ public class EbookService {
     private EbookMapper ebookMapper;
 
     @Autowired
+    private DocMapper docMapper;
+
+    @Autowired
     private SnowFlake snowFlake;
 
     public PageResp<EbookQueryResp> list(EbookQueryReq req) {
@@ -39,23 +44,23 @@ public class EbookService {
         //相当于where条件
         EbookExample.Criteria criteria = ebookExample.createCriteria();
         //动态SQL
-        if(!ObjectUtils.isEmpty(req.getName())){
+        if (!ObjectUtils.isEmpty(req.getName())) {
             criteria.andNameLike("%" + req.getName() + "%");
         }
 
-        if(!ObjectUtils.isEmpty(req.getCategoryId2())){
+        if (!ObjectUtils.isEmpty(req.getCategoryId2())) {
             criteria.andCategory2IdEqualTo(req.getCategoryId2());
         }
 
         //从1开始。只对第一个遇到的select起作用
-        PageHelper.startPage(req.getPage(),req.getSize());
+        PageHelper.startPage(req.getPage(), req.getSize());
         //持久层返回List<Ebook>需要转换成List<EbookResp>再返回Controller
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
-        PageInfo<Ebook>pageInfo=new PageInfo<>(ebookList);
+        PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
         //一般前端分页组件只需要total，就会自己计算出pages
-        LOG.info("总行数：{}",pageInfo.getTotal());
-        LOG.info("总页数：{}",pageInfo.getPages());
+        LOG.info("总行数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
 
 
         // List<EbookResp>respList = new ArrayList<>();
@@ -70,7 +75,7 @@ public class EbookService {
         //列表复制
         List<EbookQueryResp> list = CopyUtil.copyList(ebookList, EbookQueryResp.class);
 
-        PageResp<EbookQueryResp>pageResp=new PageResp<>();
+        PageResp<EbookQueryResp> pageResp = new PageResp<>();
         pageResp.setTotal(pageInfo.getTotal());
         pageResp.setList(list);
         return pageResp;
@@ -78,24 +83,31 @@ public class EbookService {
 
     /**
      * 保存
+     *
      * @param req
      */
     public void save(EbookSaveReq req) {
-        Ebook ebook=CopyUtil.copy(req,Ebook.class);
-        if(ObjectUtils.isEmpty(req.getId())){
+        Ebook ebook = CopyUtil.copy(req, Ebook.class);
+        if (ObjectUtils.isEmpty(req.getId())) {
             //新增
             ebook.setId(snowFlake.nextId());
             ebook.setDocCount(0);
             ebook.setViewCount(0);
             ebook.setVoteCount(0);
             ebookMapper.insert(ebook);
-        }else {
+        } else {
             //更新
             ebookMapper.updateByPrimaryKey(ebook);
         }
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         ebookMapper.deleteByPrimaryKey(id);
+
+        //删除电子书时删除关联文档
+        DocExample docExample = new DocExample();
+        DocExample.Criteria criteria = docExample.createCriteria();
+        criteria.andEbookIdEqualTo(id);
+        docMapper.deleteByExample(docExample);
     }
 }

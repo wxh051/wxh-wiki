@@ -87,6 +87,7 @@ public class CategoryService {
         }
     }
 
+    //暂未解决，删除子分类的问题
     public void delete(Long id){
         categoryMapper.deleteByPrimaryKey(id);
     }

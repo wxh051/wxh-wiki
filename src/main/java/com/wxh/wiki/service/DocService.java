@@ -3,6 +3,7 @@ package com.wxh.wiki.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.wxh.wiki.domain.Content;
+import com.wxh.wiki.domain.ContentExample;
 import com.wxh.wiki.domain.Doc;
 import com.wxh.wiki.domain.DocExample;
 import com.wxh.wiki.mapper.ContentMapper;
@@ -115,8 +116,15 @@ public class DocService {
     public void delete(List<String> ids) {
         DocExample docExample = new DocExample();
         DocExample.Criteria criteria = docExample.createCriteria();
+        //这里修改了docexample类中的andIdIn方法参数为String类型
         criteria.andIdIn(ids);
         docMapper.deleteByExample(docExample);
+
+        //删除文档内容
+        ContentExample contentExample=new ContentExample();
+        ContentExample.Criteria criteria1=contentExample.createCriteria();
+        criteria1.andIdIn(ids);
+        contentMapper.deleteByExample(contentExample);
     }
 
     public String  findContent(Long id){
