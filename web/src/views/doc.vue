@@ -118,6 +118,8 @@ export default defineComponent({
         // 选中某一节点时，加载该节点的文档信息
         // props代表整个文档的一行数据
         doc.value = info.selectedNodes[0].props;
+        // 增加这一行就行了
+        doc.value.viewCount++;
         // 加载内容
         handleQueryContent(selectedKeys[0]);
       }
