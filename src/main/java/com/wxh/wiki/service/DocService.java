@@ -19,7 +19,6 @@ import com.wxh.wiki.util.CopyUtil;
 import com.wxh.wiki.util.RedisUtil;
 import com.wxh.wiki.util.RequestContext;
 import com.wxh.wiki.util.SnowFlake;
-import com.wxh.wiki.websocket.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ public class DocService {
     private RedisUtil redisUtil;
 
     @Autowired
-    private WebSocketServer webSocketServer;
+    private WsService wsService;
 
     public List<DocQueryResp> all(Long ebookId) {
         DocExample docExample = new DocExample();
@@ -171,7 +170,7 @@ public class DocService {
         //推送消息
         //这里获取名字采用从数据库查，也可以通过前端传过来
         Doc docDb = docMapper.selectByPrimaryKey(id);
-        webSocketServer.sendInfo("【" + docDb.getName() + "】被点赞！");
+        wsService.sendInfo("【" + docDb.getName() + "】被点赞！");
     }
 
     //在这里调用定时器需要的SQL语句，定时器通过service调用。避免job直接调用mapper
