@@ -28,7 +28,6 @@ public class DocJob {
         long start = System.currentTimeMillis();
         docService.updateEbookInfo();
         LOG.info("更新电子书下的文档数据结束，耗时：{}毫秒", System.currentTimeMillis() - start);
-
     }
 
 }
