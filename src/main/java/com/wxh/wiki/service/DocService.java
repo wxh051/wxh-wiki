@@ -8,6 +8,7 @@ import com.wxh.wiki.domain.Doc;
 import com.wxh.wiki.domain.DocExample;
 import com.wxh.wiki.mapper.ContentMapper;
 import com.wxh.wiki.mapper.DocMapper;
+import com.wxh.wiki.mapper.DocMapperCust;
 import com.wxh.wiki.req.DocQueryReq;
 import com.wxh.wiki.req.DocSaveReq;
 import com.wxh.wiki.resp.DocQueryResp;
@@ -39,6 +40,9 @@ public class DocService {
 
     @Autowired
     private ContentMapper contentMapper;
+
+    @Autowired
+    private DocMapperCust docMapperCust;
 
     public List<DocQueryResp> all(Long ebookId) {
         DocExample docExample = new DocExample();
@@ -92,6 +96,8 @@ public class DocService {
         if (ObjectUtils.isEmpty(req.getId())) {
             //新增
             doc.setId(snowFlake.nextId());
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
 
             //这里不能再通过雪花算法获取了，而是直接去获取doc的ID，他两是一样的必须
@@ -129,6 +135,8 @@ public class DocService {
 
     public String  findContent(Long id){
         Content content = contentMapper.selectByPrimaryKey(id);
+        //文档阅读数加一
+        docMapperCust.increaseViewCount(id);
         if(!ObjectUtils.isEmpty(content)){
             return content.getContent();
         }else{
