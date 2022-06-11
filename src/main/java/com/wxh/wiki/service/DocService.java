@@ -56,6 +56,9 @@ public class DocService {
     @Autowired
     private WsService wsService;
 
+    // @Autowired
+    // private RocketMQTemplate rocketMQTemplate;
+
     public List<DocQueryResp> all(Long ebookId) {
         DocExample docExample = new DocExample();
         //必须这么写，这时ebookid=null,则搜不到任何文档
@@ -175,6 +178,7 @@ public class DocService {
         Doc docDb = docMapper.selectByPrimaryKey(id);
         String logId = MDC.get("LOG_ID");
         wsService.sendInfo("【" + docDb.getName() + "】被点赞！", logId);
+        //rocketMQTemplate.convertAndSend("VOTE_TOPIC","【" + docDb.getName() + "】被点赞！");
     }
 
     //在这里调用定时器需要的SQL语句，定时器通过service调用。避免job直接调用mapper
