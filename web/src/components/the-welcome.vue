@@ -101,7 +101,7 @@
 import {defineComponent, ref, onMounted} from 'vue'
 import axios from 'axios';
 
-declare let echarts:any;
+declare let echarts: any;
 
 export default defineComponent({
   name: 'the-welcome',
@@ -149,11 +149,91 @@ export default defineComponent({
       });
     };
 
+    //list就是后端返回的30天数据
+    const init30DayEcharts = (list: any) => {
+      // 基于准备好的dom，初始化echarts实例
+      const myChart = echarts.init(document.getElementById('main'));
+
+      // 横轴
+      const xAxis = [];
+      // 纵轴的两组数据
+      const seriesView = [];
+      const seriesVote = [];
+      for (let i = 0; i < list.length; i++) {
+        const record = list[i];
+        xAxis.push(record.date);
+        seriesView.push(record.viewIncrease);
+        seriesVote.push(record.voteIncrease);
+      }
+
+      // 指定图表的配置项和数据
+      const option = {
+        title: {
+          text: '30天趋势图'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          data: ['总阅读量', '总点赞量']
+        },
+        grid: {
+          left: '1%',
+          right: '3%',
+          bottom: '3%',
+          containLabel: true
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: xAxis
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            name: '总阅读量',
+            type: 'line',
+            // stack: '总量', 不堆叠
+            data: seriesView,
+            smooth: true
+          },
+          {
+            name: '总点赞量',
+            type: 'line',
+            // stack: '总量', 不堆叠
+            data: seriesVote,
+            smooth: true
+          }
+        ]
+      };
+
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+    };
+
+    const get30DayStatistic = () => {
+      axios.get('/ebook-snapshot/get-30-statistic').then((response) => {
+        const data = response.data;
+        if (data.success) {
+          const statisticList = data.content;
+
+          init30DayEcharts(statisticList)
+        }
+      });
+    };
+
     const testEcharts = () => {
       // 基于准备好的dom，初始化echarts实例
       // 这里的echarts是全局的变量，是属于Vue外部的，需要使用declare声明一下
       // 又因为echarts的示例使用的是原生的JS（当时使用的是var），现在得改成const
-      const  myChart = echarts.init(document.getElementById('main'));
+      const myChart = echarts.init(document.getElementById('main'));
 
       // 指定图表的配置项和数据
       const option = {
@@ -183,7 +263,8 @@ export default defineComponent({
 
     onMounted(() => {
       getStatistic();
-      testEcharts();
+      // testEcharts();
+      get30DayStatistic();
     });
 
     return {

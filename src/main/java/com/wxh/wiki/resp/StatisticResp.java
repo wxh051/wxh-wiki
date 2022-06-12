@@ -1,5 +1,7 @@
 package com.wxh.wiki.resp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -7,6 +9,9 @@ import java.util.Date;
  * @date 2022-06-11 23:11
  */
 public class StatisticResp {
+
+    //格式化日期的显示：月-日（展示在echarts表横轴）
+    @JsonFormat(pattern = "MM-dd",timezone = "GMT+8")
     private Date date;
 
     private int viewCount;
