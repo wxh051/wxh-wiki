@@ -274,6 +274,8 @@ export default defineComponent({
             page: 1,
             size: pagination.value.pageSize
           });
+        }else {
+          message.error(data.message);
         }
       });
     };

@@ -1,5 +1,6 @@
 package com.wxh.wiki.config;
 
+import com.wxh.wiki.interceptor.ActionInterceptor;
 import com.wxh.wiki.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,9 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     @Autowired
     LoginInterceptor loginInterceptor;
 
+    @Autowired
+    ActionInterceptor actionInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
@@ -34,5 +38,11 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                         "/doc/find-content/**",
                         "/ebook-snapshot/**"
                 );
+
+        registry.addInterceptor(actionInterceptor)
+                .addPathPatterns(
+                        "/*/save",
+                        "/*/delete/**",
+                        "/*/reset-password");
     }
 }

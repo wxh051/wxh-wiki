@@ -201,6 +201,8 @@ export default defineComponent({
         if (data.success) {
           //重新加载列表，查询当前页
           handleQuery();
+        }else {
+          message.error(data.message);
         }
       });
     };
