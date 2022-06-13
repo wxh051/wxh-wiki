@@ -1,5 +1,8 @@
 package com.wxh.wiki.interceptor;
 
+import com.alibaba.fastjson.JSON;
+import com.wxh.wiki.resp.UserLoginResp;
+import com.wxh.wiki.util.LoginUserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -58,6 +61,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         } else {
             LOG.info("已登录：{}", object);
+            LoginUserContext.setUser(JSON.parseObject((String) object, UserLoginResp.class));
             return true;
         }
     }
