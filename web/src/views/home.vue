@@ -5,12 +5,13 @@
           mode="inline"
           :style="{ height: '100%', borderRight: 0 }"
           @click="handleClick"
+          :openKeys="openKeys"
       >
         <a-menu-item key="welcome">
           <MailOutlined/>
           <span>欢迎</span>
         </a-menu-item>
-        <a-sub-menu v-for="item in level1" :key="item.id">
+        <a-sub-menu v-for="item in level1" :key="item.id" :disabled="true">
           <!--   一级菜单       -->
           <template v-slot:title>
             <span>
@@ -37,15 +38,15 @@
           <a-list-item key="item.name">
             <template #actions>
               <span>
-                <component v-bind:is="'FileOutlined'" style="margin-right: 8px" />
+                <component v-bind:is="'FileOutlined'" style="margin-right: 8px"/>
                 {{ item.docCount }}
               </span>
               <span>
-                <component v-bind:is="'UserOutlined'" style="margin-right: 8px" />
+                <component v-bind:is="'UserOutlined'" style="margin-right: 8px"/>
                 {{ item.viewCount }}
               </span>
               <span>
-                <component v-bind:is="'LikeOutlined'" style="margin-right: 8px" />
+                <component v-bind:is="'LikeOutlined'" style="margin-right: 8px"/>
                 {{ item.voteCount }}
               </span>
             </template>
@@ -90,6 +91,8 @@ export default defineComponent({
     //定义一个变量，实际上返回的是里面的属性，将这个属性变成一个响应式变量
     // const ebooks1 = reactive({books: []});
 
+    const openKeys=ref();
+
     const level1 = ref();
     let categorys: any;
     /**
@@ -101,6 +104,12 @@ export default defineComponent({
         if (data.success) {
           categorys = data.content;
           console.log("原始数组：", categorys);
+
+          // 加载完分类后，将侧边栏全部展开
+          openKeys.value = [];
+          for (let i = 0; i < categorys.length; i++) {
+            openKeys.value.push(categorys[i].id)
+          }
 
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
@@ -160,15 +169,17 @@ export default defineComponent({
         },
         pageSize: 3,
       },
-   /*   actions: [
-        {type: 'StarOutlined', text: '156'},
-        {type: 'LikeOutlined', text: '156'},
-        {type: 'MessageOutlined', text: '2'},
-      ],*/
+      /*   actions: [
+           {type: 'StarOutlined', text: '156'},
+           {type: 'LikeOutlined', text: '156'},
+           {type: 'MessageOutlined', text: '2'},
+         ],*/
 
       handleClick,
       level1,
       isShowWelcome,
+
+      openKeys
     }
   }
 });
