@@ -81,6 +81,24 @@
     <a-form :model="ebook" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="封面">
         <a-input v-model:value="ebook.cover"/>
+        <a-upload
+            v-model:file-list="fileList"
+            name="avatar"
+            list-type="picture-card"
+            class="avatar-uploader"
+            :show-upload-list="false"
+            action="http://127.0.0.1:8888/ebook/upload/avatar"
+            :before-upload="beforeUpload"
+            @change="handleChange"
+        >
+          <!--     这个SRC其实就是对应的base64字符串     -->
+          <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
+          <div v-else>
+            <loading-outlined v-if="coverLoading"></loading-outlined>
+            <plus-outlined v-else></plus-outlined>
+            <div class="ant-upload-text">Upload</div>
+          </div>
+        </a-upload>
       </a-form-item>
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name"/>
@@ -107,6 +125,13 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
+
+//把本地图片转成base64，为了可以显示到页面上
+function getBase64(img: Blob, callback: (base64Url: string) => void) {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result as string));
+  reader.readAsDataURL(img);
+}
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -323,6 +348,43 @@ export default defineComponent({
       return result;
     };
 
+    const fileList = ref([]);
+    const coverLoading = ref<boolean>(false);
+    const imageUrl = ref<string>('');
+
+    const handleChange = (info: any) => {
+      if (info.file.status === 'upcoverLoading') {
+        coverLoading.value = true;
+        return;
+      }
+      if (info.file.status === 'done') {
+        // Get this url from response in real world.
+        getBase64(info.file.originFileObj, (base64Url: string) => {
+          imageUrl.value = base64Url;
+          coverLoading.value = false;
+        });
+
+        //info.file.name拿到文件的名字
+        ebook.value.cover = "/file/" + info.file.name;
+      }
+      if (info.file.status === 'error') {
+        coverLoading.value = false;
+        message.error('upload error');
+      }
+    };
+
+    const beforeUpload = (file: any) => {
+      const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+      if (!isJpgOrPng) {
+        message.error('You can only upload JPG file!');
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        message.error('Image must smaller than 2MB!');
+      }
+      return isJpgOrPng && isLt2M;
+    };
+
     onMounted(() => {
       //加载分类
       handleQueryCategory();
@@ -348,7 +410,13 @@ export default defineComponent({
       modalLoading,
       handleModalOk,
       categoryIds,
-      level1
+      level1,
+
+      fileList,
+      coverLoading,
+      imageUrl,
+      handleChange,
+      beforeUpload,
     }
   }
 });

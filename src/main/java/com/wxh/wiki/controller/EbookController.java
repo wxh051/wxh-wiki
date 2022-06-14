@@ -6,10 +6,15 @@ import com.wxh.wiki.resp.CommonResp;
 import com.wxh.wiki.resp.EbookQueryResp;
 import com.wxh.wiki.resp.PageResp;
 import com.wxh.wiki.service.EbookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author wxh
@@ -23,6 +28,9 @@ import javax.validation.Valid;
 //忽视泛型警告信息
 @SuppressWarnings({"rawtypes"})
 public class EbookController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EbookController.class);
+
 
     @Autowired
     private EbookService ebookService;
@@ -50,5 +58,22 @@ public class EbookController {
         CommonResp resp = new CommonResp<>();
         ebookService.delete(id);
         return resp;
+    }
+
+    //通用
+    @RequestMapping("/upload/avatar")
+    public CommonResp upload(@RequestParam MultipartFile avatar) throws IOException {
+        LOG.info("上传文件开始：{}", avatar);
+        LOG.info("文件名：{}", avatar.getOriginalFilename());
+        LOG.info("文件大小：{}", avatar.getSize());
+
+        // 保存文件到本地
+        String fileName = avatar.getOriginalFilename();
+        String fullPath = "D:/Java/project/wiki/avatar/" + fileName;
+        File dest = new File(fullPath);
+        avatar.transferTo(dest);
+        LOG.info(dest.getAbsolutePath());
+
+        return new CommonResp();
     }
 }
