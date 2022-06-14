@@ -5,6 +5,7 @@ import com.wxh.wiki.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -37,7 +38,8 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                         "/doc/vote/**",
                         "/doc/find-content/**",
                         "/ebook-snapshot/**",
-                        "/ebook/upload/avatar"
+                        "/ebook/upload/avatar",
+                        "/file/**"
                 );
 
         registry.addInterceptor(actionInterceptor)
@@ -45,5 +47,11 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                         "/*/save",
                         "/*/delete/**",
                         "/*/reset-password");
+    }
+
+    //对静态资源的处理，所有访问/file的路径，都定位到D盘这个目录下
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/file/**").addResourceLocations("file:D:/Java/project/wiki/avatar/");
     }
 }
