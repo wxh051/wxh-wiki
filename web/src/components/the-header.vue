@@ -51,6 +51,11 @@
           关于我们
         </router-link>
       </a-menu-item>
+      <a-menu-item key="/changan">
+        <router-link to="/changan">
+          长安三帅
+        </router-link>
+      </a-menu-item>
     </a-menu>
 
     <a-modal
