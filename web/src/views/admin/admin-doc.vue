@@ -222,6 +222,9 @@ export default defineComponent({
     //zIndex覆盖层级大小，越大就会排在越顶级，把其他元素挡住。这里是为了在编辑文档时，不把它的元素（如树形下拉框）挡住
     editor.config.zIndex = 0;
 
+    // 显示上传图片按钮，转成Base64存储，同时也支持拖拽图片
+    editor.config.uploadImgShowBase64 = true;
+
     //handleModalOk是点击确定按钮是触发这个方法
     const handleSave = () => {
       // modalLoading.value = true;
