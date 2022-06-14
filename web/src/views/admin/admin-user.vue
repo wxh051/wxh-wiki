@@ -95,9 +95,18 @@
       :confirm-loading="resetModalLoading"
       @ok="handleResetModalOk"
   >
-    <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-      <a-form-item label="新密码">
-        <a-input v-model:value="user.password" type="password"/>
+    <a-form
+        :model="user"
+        :label-col="{ span: 6 }"
+        :wrapper-col="{ span: 18 }"
+        :rules="rules"
+        ref="formRef"
+    >
+      <a-form-item label="新密码" has-feedback name="password">
+        <a-input v-model:value="user.password" type="password" autocomplete="off"/>
+      </a-form-item>
+      <a-form-item label="确认密码" has-feedback name="confirmPassword">
+        <a-input v-model:value="user.confirmPassword" type="password" autocomplete="off"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -108,6 +117,7 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
+import {RuleObject,ValidateErrorEntity} from 'ant-design-vue/es/form/interface';
 
 //告诉文件这两个变量是存在的。使用第三方的js，可以先在这定义一下，即使这里的md5是全局的。但是我好像没加也没有报错
 declare let hexMd5: any;
@@ -116,6 +126,9 @@ declare let KEY: any;
 export default defineComponent({
   name: 'AdminUser',
   setup() {
+    //用于重置密码信息校验
+    const formRef = ref();
+
     const param = ref();
     param.value = {};
     const users = ref();
@@ -241,28 +254,60 @@ export default defineComponent({
       });
     };
 
+    let validatePass = async (rule: RuleObject, value: string) => {
+      if (value === '') {
+        return Promise.reject('密码为空，请重新输入');
+      } else if (value !== user.value.password) {
+        return Promise.reject("输入密码不相同!");
+      } else {
+        return Promise.resolve();
+      }
+    };
+
+    //登录时检验密码和账号
+    //trigger:校验触发的时机(blur：失去焦点 change：发生变化）
+    const rules = {
+      password: [
+        {required: true, message: '密码为空，请重新输入', trigger: ['change', 'blur']},
+        {min: 6, max: 20, message: '密码长度最低为6位，最高为20位', trigger: ['change', 'blur']},
+        {
+          trigger: ['change', 'blur'],
+          message: '密码强度太低，至少包含数字和字母',
+          pattern: '^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$',
+        }
+      ],
+      confirmPassword: [
+        { validator: validatePass,trigger: ['change', 'blur']},
+      ],
+    };
+
     // -------- 重置密码 ---------
     const resetModalVisible = ref(false);
     const resetModalLoading = ref(false);
     const handleResetModalOk = () => {
-      resetModalLoading.value = true;
-      //KEY是一个盐值，使密文更难以破解
-      user.value.password = hexMd5(user.value.password + KEY);
-      axios.post("/user/reset-password", user.value).then((response) => {
-        resetModalLoading.value = false;
-        const data = response.data; // data = commonResp
-        if (data.success) {
-          resetModalVisible.value = false;
+      formRef.value.validate().then(() => {
+        resetModalLoading.value = true;
+        //KEY是一个盐值，使密文更难以破解
+        user.value.password = hexMd5(user.value.password + KEY);
+        axios.post("/user/reset-password", user.value).then((response) => {
+          resetModalLoading.value = false;
+          const data = response.data; // data = commonResp
+          if (data.success) {
+            resetModalVisible.value = false;
 
-          // 重新加载列表
-          handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize,
+            // 重新加载列表
+            handleQuery({
+              page: pagination.value.current,
+              size: pagination.value.pageSize,
+            });
+          } else {
+            message.error(data.message);
+          }
+        });
+      })
+          .catch((error: ValidateErrorEntity) => {
+            message.error('密码输入不符号要求');
           });
-        } else {
-          message.error(data.message);
-        }
-      });
     };
 
     /**
@@ -305,7 +350,10 @@ export default defineComponent({
       resetModalVisible,
       resetModalLoading,
       handleResetModalOk,
-      resetPassword
+      resetPassword,
+
+      rules,
+      formRef
     }
   }
 });
