@@ -70,6 +70,7 @@ public class EbookController {
         // 保存文件到本地
         String fileName = avatar.getOriginalFilename();
         String fullPath = "D:/Java/project/wiki/avatar/" + fileName;
+        // String fullPath = "/root/file/wiki/" + fileName;
         File dest = new File(fullPath);
         avatar.transferTo(dest);
         LOG.info(dest.getAbsolutePath());
